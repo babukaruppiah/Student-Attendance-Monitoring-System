@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SECE Attendance Portal – II ECE C</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#0f2044;--navy2:#1a3560;--teal:#1e8fa1;--teal2:#25aec0;
+  --gold:#e8a020;--gold2:#f5b833;--rose:#c94040;--green:#1e9e5a;
+  --orange:#d97020;--sky:#3b8fd4;--bg:#f0f4fa;--card:#ffffff;
+  --text:#1a2540;--muted:#5a6880;--border:#d4dcea;
+  --absent-bg:#fde8e8;--absent:#c0392b;
+  --od-bg:#e8f4fd;--od:#1565c0;
+  --leave-bg:#fff8e1;--leave:#e65100;
+  --present-bg:#e8f5e9;--present:#1b5e20;
+  --holiday-bg:#f3e5f5;--holiday:#6a1b9a;
+  --shadow:0 4px 24px rgba(15,32,68,.10);
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ===== HEADER ===== */
+.site-header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#1e4a8a 100%);
+  color:#fff;padding:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+.header-top{display:flex;align-items:center;gap:16px;padding:12px 24px 10px;}
+.header-logo{width:70px;height:70px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.header-logo img{width:64px;height:64px;border-radius:50%;object-fit:cover;}
+.header-logo-fallback{font-size:28px;}
+.header-text{flex:1;}
+.header-text h1{font-family:'Playfair Display',serif;font-size:1.35rem;letter-spacing:.5px;line-height:1.2;}
+.header-text h2{font-size:.92rem;font-weight:400;opacity:.88;margin-top:2px;}
+.header-text .class-info{font-size:.82rem;opacity:.78;margin-top:3px;display:flex;flex-wrap:wrap;gap:8px;}
+.header-text .class-info span{background:rgba(255,255,255,.12);border-radius:4px;padding:1px 8px;}
+.header-nav{background:rgba(255,255,255,.07);border-top:1px solid rgba(255,255,255,.12);
+  display:flex;gap:0;overflow-x:auto;padding:0 16px;}
+.nav-btn{background:none;border:none;color:rgba(255,255,255,.78);font-family:'DM Sans',sans-serif;
+  font-size:.82rem;font-weight:500;padding:10px 14px;cursor:pointer;border-bottom:3px solid transparent;
+  white-space:nowrap;transition:all .2s;letter-spacing:.3px;}
+.nav-btn:hover{color:#fff;background:rgba(255,255,255,.08);}
+.nav-btn.active{color:var(--gold2);border-bottom-color:var(--gold2);}
+.user-bar{display:flex;align-items:center;gap:10px;padding:6px 24px;
+  background:rgba(0,0,0,.15);font-size:.78rem;justify-content:flex-end;}
+.user-bar .user-chip{background:rgba(255,255,255,.15);border-radius:20px;
+  padding:3px 12px;display:flex;align-items:center;gap:6px;}
+.logout-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  color:#fff;border-radius:6px;padding:3px 10px;font-size:.75rem;cursor:pointer;transition:.2s;}
+.logout-btn:hover{background:rgba(255,255,255,.25);}
+
+/* ===== LOGIN ===== */
+#loginScreen{min-height:100vh;background:linear-gradient(160deg,var(--navy) 0%,#1e4a8a 50%,var(--teal) 100%);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;}
+.login-box{background:#fff;border-radius:20px;padding:40px 36px;width:380px;max-width:95vw;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.login-logo{text-align:center;margin-bottom:20px;}
+.login-logo .logo-circle{width:80px;height:80px;background:linear-gradient(135deg,var(--navy),var(--teal));
+  border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;
+  font-size:32px;}
+.login-logo h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--navy);}
+.login-logo p{font-size:.82rem;color:var(--muted);margin-top:4px;}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase;}
+.form-group input,.form-group select{width:100%;padding:10px 14px;border:2px solid var(--border);
+  border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;transition:.2s;background:#f9fafb;}
+.form-group input:focus,.form-group select:focus{border-color:var(--teal);background:#fff;}
+.btn-login{width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--teal));
+  color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;
+  font-weight:600;cursor:pointer;transition:.2s;letter-spacing:.5px;}
+.btn-login:hover{opacity:.9;transform:translateY(-1px);}
+.login-hint{font-size:.75rem;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6;}
+
+/* ===== MAIN LAYOUT ===== */
+.main-content{padding:20px;max-width:1400px;margin:0 auto;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ===== CARDS ===== */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px;}
+.card-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--bg);padding-bottom:10px;}
+.card-title .icon{font-size:1.2rem;}
+
+/* ===== STATS GRID ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);
+  text-align:center;border-top:4px solid var(--teal);}
+.stat-card.gold{border-top-color:var(--gold);}
+.stat-card.rose{border-top-color:var(--rose);}
+.stat-card.green{border-top-color:var(--green);}
+.stat-card.orange{border-top-color:var(--orange);}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:500;color:var(--navy);}
+.stat-label{font-size:.75rem;color:var(--muted);margin-top:4px;letter-spacing:.3px;text-transform:uppercase;}
+
+/* ===== DATE PICKER AREA ===== */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px;}
+.toolbar input[type=date],.toolbar select{padding:8px 14px;border:2px solid var(--border);
+  border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;background:#fff;transition:.2s;}
+.toolbar input[type=date]:focus,.toolbar select:focus{border-color:var(--teal);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+.btn-secondary{background:var(--bg);color:var(--navy);border:2px solid var(--border);}
+.btn-secondary:hover{border-color:var(--teal);color:var(--teal);}
+.btn-danger{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;}
+.btn-success{background:linear-gradient(135deg,var(--green),#27ae60);color:#fff;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);}
+.btn-holiday{background:linear-gradient(135deg,#6a1b9a,#ab47bc);color:#fff;}
+.btn-sm{padding:5px 12px;font-size:.78rem;}
+
+/* ===== PERIOD SELECTOR ===== */
+.period-selector{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.period-chip{padding:7px 14px;border:2px solid var(--border);border-radius:8px;
+  background:#fff;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;gap:2px;}
+.period-chip:hover:not(.disabled){border-color:var(--teal);background:rgba(30,143,161,.07);}
+.period-chip.selected{border-color:var(--teal);background:rgba(30,143,161,.15);color:var(--navy);}
+.period-chip.saved{border-color:#aaa;background:#f0f0f0;color:#888;cursor:not-allowed;}
+.period-chip.holiday-period{border-color:#6a1b9a;background:var(--holiday-bg);color:#6a1b9a;cursor:not-allowed;}
+.period-chip.disabled{opacity:.5;cursor:not-allowed;}
+.period-chip .pname{font-size:.7rem;font-weight:400;color:var(--muted);}
+.period-chip.selected .pname{color:var(--teal);}
+.forenoon-label,.afternoon-label{font-size:.72rem;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;color:var(--muted);align-self:center;padding:0 4px;}
+
+/* ===== ATTENDANCE TABLE ===== */
+.att-table-wrap{overflow-x:auto;}
+table.att-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+table.att-table th{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;
+  padding:10px 8px;text-align:center;font-weight:500;letter-spacing:.3px;position:sticky;top:0;}
+table.att-table th.left{text-align:left;}
+table.att-table td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle;}
+table.att-table tr:hover td{background:rgba(30,143,161,.04);}
+table.att-table tr:nth-child(even) td{background:#f8fafd;}
+table.att-table tr:nth-child(even):hover td{background:rgba(30,143,161,.06);}
+.sno{width:36px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);}
+.sname{font-weight:500;text-align:left!important;padding-left:12px!important;min-width:140px;}
+.sroll{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);min-width:90px;}
+
+/* ===== ATTENDANCE BUTTONS ===== */
+.att-btn-group{display:flex;gap:4px;justify-content:center;}
+.att-btn{padding:5px 10px;border:2px solid transparent;border-radius:6px;font-size:.75rem;
+  font-weight:700;cursor:pointer;transition:all .18s;min-width:38px;letter-spacing:.3px;
+  font-family:'DM Sans',sans-serif;}
+.att-btn.btn-P{background:var(--present-bg);color:var(--present);border-color:#a5d6a7;}
+.att-btn.btn-A{background:#fff;color:var(--absent);border-color:#ef9a9a;}
+.att-btn.btn-L{background:#fff;color:var(--leave);border-color:#ffcc80;}
+.att-btn.btn-OD{background:#fff;color:var(--od);border-color:#90caf9;}
+.att-btn.active-P{background:var(--present);color:#fff;border-color:var(--present);}
+.att-btn.active-A{background:var(--absent);color:#fff;border-color:var(--absent);}
+.att-btn.active-L{background:var(--orange);color:#fff;border-color:var(--orange);}
+.att-btn.active-OD{background:var(--sky);color:#fff;border-color:var(--sky);}
+.att-btn:disabled{opacity:.5;cursor:not-allowed;}
+.att-btn:hover:not(:disabled){transform:scale(1.08);}
+
+/* ===== PERCENTAGE BADGE ===== */
+.pct-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;font-weight:600;}
+.pct-high{background:var(--present-bg);color:var(--present);}
+.pct-mid{background:var(--leave-bg);color:var(--leave);}
+.pct-low{background:var(--absent-bg);color:var(--absent);}
+
+/* ===== SESSION LABELS ===== */
+.session-bar{display:flex;gap:0;margin-bottom:0;}
+.session-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  padding:4px 12px;border-radius:4px;}
+.session-fn{background:#e3f2fd;color:#0d47a1;}
+.session-an{background:#fff8e1;color:#e65100;}
+
+/* ===== HOLIDAY BANNER ===== */
+.holiday-banner{background:linear-gradient(135deg,#f3e5f5,#e1bee7);border:2px solid #ce93d8;
+  border-radius:10px;padding:14px 20px;text-align:center;color:#4a148c;font-weight:600;
+  margin-bottom:12px;font-size:1rem;}
+
+/* ===== TIMETABLE ENTRY ===== */
+.tt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.tt-cell{background:var(--bg);border:2px solid var(--border);border-radius:8px;padding:12px;}
+.tt-cell label{font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;}
+.tt-cell select,.tt-cell input{width:100%;padding:6px 10px;border:1px solid var(--border);
+  border-radius:6px;font-size:.82rem;font-family:'DM Sans',sans-serif;outline:none;}
+
+/* ===== FACULTY MGMT ===== */
+.faculty-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+.faculty-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--navy));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;font-weight:700;flex-shrink:0;}
+.faculty-info{flex:1;}
+.faculty-info h4{font-weight:600;font-size:.92rem;}
+.faculty-info p{font-size:.78rem;color:var(--muted);margin-top:2px;}
+.faculty-role{font-size:.72rem;padding:2px 10px;border-radius:20px;font-weight:600;}
+.role-advisor{background:#e8f5e9;color:#1b5e20;}
+.role-tutor{background:#e3f2fd;color:#0d47a1;}
+.role-faculty{background:#fff8e1;color:#e65100;}
+
+/* ===== SMS / PARENT ===== */
+.sms-msg{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border-left:4px solid var(--green);
+  border-radius:8px;padding:14px;font-size:.85rem;margin-bottom:10px;color:#1b5e20;}
+.sms-msg-ta{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-left:4px solid var(--gold);
+  color:#5d4037;}
+
+/* ===== MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+  display:flex;align-items:center;justify-content:center;padding:16px;animation:fadein .2s;}
+.modal{background:#fff;border-radius:16px;padding:28px;max-width:500px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slidein .25s;}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes slidein{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:16px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+
+/* ===== TOAST ===== */
+#toast{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:8px;}
+.toast-item{background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;
+  font-size:.85rem;box-shadow:0 4px 20px rgba(0,0,0,.3);animation:toastin .3s;
+  display:flex;align-items:center;gap:8px;max-width:340px;}
+.toast-item.success{background:var(--green);}
+.toast-item.error{background:var(--rose);}
+.toast-item.info{background:var(--teal);}
+@keyframes toastin{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ===== TABLE MISC ===== */
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600;}
+.badge-present{background:var(--present-bg);color:var(--present);}
+.badge-absent{background:var(--absent-bg);color:var(--absent);}
+.badge-leave{background:var(--leave-bg);color:var(--leave);}
+.badge-od{background:var(--od-bg);color:var(--od);}
+.badge-holiday{background:var(--holiday-bg);color:var(--holiday);}
+
+/* ===== REPORT ===== */
+.report-filter{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.section-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--navy);
+  margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+/* ===== LOW ATT ALERT ===== */
+.low-att-row td{background:#fff5f5!important;}
+.low-att-row:hover td{background:#ffe8e8!important;}
+.att-alert-chip{background:#c62828;color:#fff;border-radius:4px;font-size:.68rem;
+  padding:2px 6px;margin-left:6px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ===== PARENT DB ===== */
+.parent-verified{color:var(--green);font-size:.8rem;}
+.parent-missing{color:var(--rose);font-size:.8rem;animation:pulse 2s infinite;}
+#bulkImportCard{border:2px dashed var(--teal);background:rgba(30,143,161,.04);}
+.sms-tab-info{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-radius:8px;
+  padding:10px 14px;font-size:.82rem;color:#0d47a1;margin-bottom:12px;}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:#f0f4fa;}
+::-webkit-scrollbar-thumb{background:var(--teal);border-radius:3px;}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .header-text h1{font-size:1rem;}
+  .att-btn{padding:4px 6px;font-size:.68rem;min-width:30px;}
+  .main-content{padding:12px;}
+}
+
+/* ===== HISTORY TABLE ===== */
+.history-cell{padding:4px 6px;text-align:center;border:1px solid var(--border);font-size:.75rem;
+  font-family:'JetBrains Mono',monospace;}
+.hc-P{background:var(--present-bg);color:var(--present);}
+.hc-A{background:var(--absent-bg);color:var(--absent);}
+.hc-L{background:var(--leave-bg);color:var(--leave);}
+.hc-OD{background:var(--od-bg);color:var(--od);}
+.hc-H{background:var(--holiday-bg);color:var(--holiday);}
+.hc--{background:#f5f5f5;color:#aaa;}
+
+/* ===== ADVISOR CAN EDIT ===== */
+.advisor-edit-btn{background:none;border:none;color:var(--teal);cursor:pointer;font-size:.82rem;
+  padding:2px 6px;border-radius:4px;transition:.2s;}
+.advisor-edit-btn:hover{background:rgba(30,143,161,.1);}
+
+/* period mapping tag */
+.period-tag{font-size:.68rem;display:block;color:var(--muted);font-weight:400;max-width:80px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ===== LOADING ===== */
+.loading{display:flex;align-items:center;justify-content:center;height:200px;color:var(--muted);
+  font-size:.9rem;gap:10px;}
+.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--teal);
+  border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== PROGRESS BAR ===== */
+.progress-bar{height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s;}
+.pf-high{background:linear-gradient(90deg,var(--green),#66bb6a);}
+.pf-mid{background:linear-gradient(90deg,var(--orange),#ffa726);}
+.pf-low{background:linear-gradient(90deg,var(--rose),#ef5350);}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto;}
+.tab-btn{background:none;border:none;border-bottom:3px solid transparent;padding:8px 18px;
+  font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;color:var(--muted);
+  margin-bottom:-2px;transition:.2s;white-space:nowrap;}
+.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ LOGIN ============================================================ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-circle">🎓</div>
+      <h2>Sri Eshwar College</h2>
+      <p>Attendance Management Portal<br>II ECE – C Section</p>
+    </div>
+    <div class="form-group">
+      <label>Login As</label>
+      <select id="loginRole">
+        <option value="">-- Select Role --</option>
+        <option value="advisor">Class Advisor – Dr. A. Babu Karuppiah</option>
+        <option value="tutor1">Tutor – Dr. Anandhakumar</option>
+        <option value="tutor2">Tutor – Ms. Faridha Banu</option>
+        <option value="faculty_ec8301">Faculty – EC8301 (Digital Circuits)</option>
+        <option value="faculty_ec8302">Faculty – EC8302 (Signals & Systems)</option>
+        <option value="faculty_ec8303">Faculty – EC8303 (Analog Comm.)</option>
+        <option value="faculty_ec8304">Faculty – EC8304 (EM Theory)</option>
+        <option value="faculty_ec8305">Faculty – EC8305 (Electronic Devices)</option>
+        <option value="faculty_ec8311">Faculty – EC8311 (Analog Circuits Lab)</option>
+        <option value="faculty_ec8312">Faculty – EC8312 (Digital Lab)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Enter password" value="1234"/>
+    </div>
+    <button class="btn-login" onclick="doLogin()">Sign In →</button>
+    <div class="login-hint">Demo password: <strong>1234</strong> for all accounts<br>
+      Class Advisor has full edit rights | Faculty can only enter their assigned periods</div>
+  </div>
+</div>
+
+<!-- ============================================================ APP SHELL ============================================================ -->
+<div id="appShell" style="display:none;">
+  <div class="site-header">
+    <div class="header-top">
+      <div class="header-logo"><span class="header-logo-fallback">🏫</span></div>
+      <div class="header-text">
+        <h1>Sri Eshwar College of Engineering, Kinathukadavu</h1>
+        <h2>Department of Electronics and Communication Engineering</h2>
+        <div class="class-info">
+          <span>II ECE – C Section</span>
+          <span>Class Advisor: Dr. A. Babu Karuppiah, Prof., Dept. of ECE</span>
+          <span>Tutors: Dr. Anandhakumar &amp; Ms. Faridha Banu, Asst. Prof., Dept. of ECE</span>
+        </div>
+      </div>
+    </div>
+    <div class="user-bar">
+      <div class="user-chip">👤 <span id="currentUserLabel">--</span></div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+    <nav class="header-nav" id="mainNav">
+      <button class="nav-btn" onclick="showPage('dashboard')">🏠 Dashboard</button>
+      <button class="nav-btn" onclick="showPage('attendance')">✅ Enter Attendance</button>
+      <button class="nav-btn" onclick="showPage('history')">📋 Attendance History</button>
+      <button class="nav-btn" onclick="showPage('report')">📊 Consolidated Report</button>
+      <button class="nav-btn" onclick="showPage('lowatt')">⚠️ Low Attendance</button>
+      <button class="nav-btn" onclick="showPage('daily')">📅 Daily Summary</button>
+      <button class="nav-btn" onclick="showPage('timetable')">🗓 Timetable</button>
+      <button class="nav-btn" onclick="showPage('students')">👥 Students</button>
+      <button class="nav-btn" onclick="showPage('sms')">📱 SMS Alerts</button>
+      <button class="nav-btn" id="navAdmin" onclick="showPage('admin')" style="display:none;">⚙️ Admin</button>
+    </nav>
+  </div>
+
+  <div class="main-content">
+
+    <!-- ======= DASHBOARD ======= -->
+    <div id="page-dashboard" class="page">
+      <div class="section-title">🏠 Dashboard</div>
+      <div class="stats-grid" id="dashStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" id="dashGridCols">
+        <div class="card">
+          <div class="card-title"><span class="icon">🔔</span> Recent Activity</div>
+          <div id="recentActivity" style="font-size:.85rem;line-height:2;color:var(--muted);">Loading…</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="icon">📉</span> Students Needing Attention</div>
+          <div id="dashLowAtt"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= ATTENDANCE ======= -->
+    <div id="page-attendance" class="page">
+      <div class="section-title">✅ Enter Attendance</div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🗓</span> Select Date &amp; Periods</div>
+        <div class="toolbar">
+          <input type="date" id="attDate" onchange="onDateChange()"/>
+          <button class="btn btn-holiday" onclick="markHoliday()">🎉 Mark as Holiday</button>
+          <button class="btn btn-primary" onclick="loadAttendanceTable()">Load Students</button>
+          <button class="btn btn-success" onclick="saveAttendance()" id="btnSave" style="display:none;">💾 Save Selected Periods</button>
+        </div>
+        <div id="holidayBanner" style="display:none;" class="holiday-banner">🎉 This day is marked as <strong id="holidayName"></strong></div>
+        <div style="margin-bottom:8px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <span class="session-label session-fn">☀️ Forenoon (P1–P4)</span>
+          <span class="session-label session-an">🌤 Afternoon (P5–P7)</span>
+        </div>
+        <div class="period-selector" id="periodSelector"></div>
+        <div id="periodInfo" style="font-size:.78rem;color:var(--muted);margin-bottom:8px;"></div>
+      </div>
+
+      <div class="card" id="attTableCard" style="display:none;">
+        <div class="card-title"><span class="icon">👥</span> Mark Attendance
+          <span style="margin-left:auto;font-size:.78rem;font-weight:400;color:var(--muted);" id="attDateLabel"></span>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-sm btn-success" onclick="markAll('P')">✓ All Present</button>
+          <button class="btn btn-sm btn-secondary" onclick="markAll('A')">✗ All Absent</button>
+          <span style="font-size:.78rem;color:var(--muted);">Legend:
+            <span class="badge badge-present">P</span> Present
+            <span class="badge badge-absent">A</span> Absent
+            <span class="badge badge-leave">L</span> Leave
+            <span class="badge badge-od">OD</span> On Duty
+          </span>
+        </div>
+        <div class="att-table-wrap">
+          <table class="att-table">
+            <thead>
+              <tr>
+                <th class="left" style="width:36px;">#</th>
+                <th class="left">Roll No.</th>
+                <th class="left">Student Name</th>
+                <th id="periodHeaders"><!-- period headers --></th>
+                <th style="min-width:100px;">Consolidated %</th>
+              </tr>
+            </thead>
+            <tbody id="attTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= HISTORY ======= -->
+    <div id="page-history" class="page">
+      <div class="section-title">📋 Attendance History</div>
+      <div class="card">
+        <div class="toolbar">
+          <select id="histStudent" onchange="loadHistory()">
+            <option value="">All Students</option>
+          </select>
+          <input type="date" id="histFrom"/>
+          <input type="date" id="histTo"/>
+          <button class="btn btn-primary" onclick="loadHistory()">🔍 View</button>
+          <button class="btn btn-secondary" onclick="exportHistoryCSV()">⬇ Export CSV</button>
+        </div>
+        <div id="historyContent"></div>
+      </div>
+    </div>
+
+    <!-- ======= REPORT ======= -->
+    <div id="page-report" class="page">
+      <div class="section-title">📊 Consolidated Attendance Report</div>
+      <div class="card">
+        <div class="report-filter">
+          <input type="date" id="repFrom"/>
+          <input type="date" id="repTo"/>
+          <select id="repCourse">
+            <option value="">All Courses</option>
+          </select>
+          <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+          <button class="btn btn-secondary" onclick="exportReportCSV()">⬇ Export CSV</button>
+        </div>
+        <div id="reportContent"></div>
+      </div>
+    </div>
+
+    <!-- ======= LOW ATTENDANCE ======= -->
+    <div id="page-lowatt" class="page">
+      <div class="section-title">⚠️ Low Attendance Students (Below 85%)</div>
+      <div class="card">
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+          <button class="btn btn-primary" onclick="loadLowAtt()">🔄 Refresh</button>
+          <button class="btn btn-gold" onclick="sendAllSMS()">📱 Send SMS to All</button>
+        </div>
+        <div id="lowAttContent"></div>
+      </div>
+    </div>
+
+    <!-- ======= DAILY SUMMARY ======= -->
+    <div id="page-daily" class="page">
+      <div class="section-title">📅 Daily Attendance Summary</div>
+      <div class="card">
+        <div class="toolbar">
+          <input type="date" id="dailyDate"/>
+          <button class="btn btn-primary" onclick="loadDailySummary()">View Summary</button>
+        </div>
+        <div id="dailyContent"></div>
+      </div>
+    </div>
+
+    <!-- ======= TIMETABLE ======= -->
+    <div id="page-timetable" class="page">
+      <div class="section-title">🗓 Timetable Configuration</div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tt','ttEntry')">📝 Enter Timetable</button>
+        <button class="tab-btn" onclick="switchTab('tt','ttView')">👁 View Timetable</button>
+        <button class="tab-btn" onclick="switchTab('tt','courses')">📚 Courses</button>
+      </div>
+      <div id="tt-ttEntry" class="tab-panel active">
+        <div class="card">
+          <div class="card-title">Configure Period–Course–Faculty Mapping</div>
+          <div class="toolbar">
+            <select id="ttDay">
+              <option value="Mon">Monday</option><option value="Tue">Tuesday</option>
+              <option value="Wed">Wednesday</option><option value="Thu">Thursday</option>
+              <option value="Fri">Friday</option><option value="Sat">Saturday</option>
+            </select>
+            <button class="btn btn-primary" onclick="loadTTDay()">Load Day</button>
+            <button class="btn btn-success" onclick="saveTTDay()">💾 Save Timetable</button>
+          </div>
+          <div id="ttDayGrid" class="tt-grid"></div>
+        </div>
+      </div>
+      <div id="tt-ttView" class="tab-panel">
+        <div class="card">
+          <div class="card-title">Weekly Timetable</div>
+          <div id="ttViewContent"></div>
+        </div>
+      </div>
+      <div id="tt-courses" class="tab-panel">
+        <div class="card">
+          <div class="card-title">Course Management</div>
+          <div id="coursesContent"></div>
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+            <input type="text" id="newCourseCode" placeholder="Course Code (e.g. EC8301)" style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;"/>
+            <input type="text" id="newCourseName" placeholder="Course Name" style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;width:220px;"/>
+            <select id="newCourseFac" style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;">
+              <option value="">Assign Faculty</option>
+            </select>
+            <button class="btn btn-primary" onclick="addCourse()">+ Add Course</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= STUDENTS ======= -->
+    <div id="page-students" class="page">
+      <div class="section-title">👥 Student Management</div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('st','stList')">Student List</button>
+        <button class="tab-btn" onclick="switchTab('st','stAdd')">Add Student</button>
+        <button class="tab-btn" onclick="switchTab('st','stParent')">Parent Contacts</button>
+      </div>
+      <div id="st-stList" class="tab-panel active">
+        <div class="card"><div id="studentListContent"></div></div>
+      </div>
+      <div id="st-stAdd" class="tab-panel">
+        <div class="card">
+          <div class="card-title">Add / Edit Student</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px;">
+            <div class="form-group"><label>Roll Number</label><input type="text" id="newRoll" placeholder="e.g. 211EC001"/></div>
+            <div class="form-group"><label>Student Name</label><input type="text" id="newName" placeholder="Full Name"/></div>
+            <div class="form-group"><label>Parent Mobile</label><input type="text" id="newMobile" placeholder="10-digit number"/></div>
+            <div class="form-group"><label>Email</label><input type="text" id="newEmail" placeholder="student@mail.com"/></div>
+          </div>
+          <button class="btn btn-primary" onclick="addStudent()">+ Add Student</button>
+        </div>
+      </div>
+      <div id="st-stParent" class="tab-panel">
+        <div class="card">
+          <div class="card-title">📞 Parent Contact Numbers
+            <button class="btn btn-sm btn-primary" style="margin-left:auto;" onclick="showPage('sms')">Open Full Parent Database →</button>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px;">
+            Quick-edit parent mobiles below. For bulk import, search, and full management use the <strong>SMS Centre</strong>.</p>
+          <div id="parentContactContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= SMS ======= -->
+    <div id="page-sms" class="page">
+      <div class="section-title">📱 Parent Mobile Database &amp; SMS Centre</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('sms','smsDB')">📂 Parent Database</button>
+        <button class="tab-btn" onclick="switchTab('sms','smsSend')">📤 Send SMS</button>
+        <button class="tab-btn" onclick="switchTab('sms','smsTemplates')">✏️ Message Templates</button>
+        <button class="tab-btn" onclick="switchTab('sms','smsHistory')">📋 Sent Log</button>
+      </div>
+
+      <!-- TAB 1: PARENT DATABASE -->
+      <div id="sms-smsDB" class="tab-panel active">
+        <div class="card">
+          <div class="card-title">📂 Parent Contact Database
+            <span style="margin-left:auto;font-size:.75rem;font-weight:400;color:var(--muted);" id="dbStats"></span>
+          </div>
+
+          <!-- Search + toolbar -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+            <input type="text" id="parentSearch" placeholder="🔍 Search by name or roll…"
+              oninput="renderParentDB()"
+              style="padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;flex:1;min-width:180px;"/>
+            <select id="parentFilter" onchange="renderParentDB()"
+              style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none;">
+              <option value="all">All Students</option>
+              <option value="missing">Missing Mobile</option>
+              <option value="low">Low Attendance (&lt;85%)</option>
+              <option value="verified">Verified</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('bulkImportCard').style.display=document.getElementById('bulkImportCard').style.display==='none'?'block':'none'">⬆ Bulk Import</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportParentCSV()">⬇ Export CSV</button>
+          </div>
+
+          <div id="parentDBTable"></div>
+        </div>
+
+        <!-- Bulk import (hidden by default, shown inline) -->
+        <div class="card" id="bulkImportCard" style="display:none;">
+          <div class="card-title">⬆ Bulk Import Parent Mobiles
+            <button onclick="document.getElementById('bulkImportCard').style.display='none'"
+              style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.1rem;">✕</button>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px;">
+            Paste CSV data below: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;">RollNo,ParentMobile,ParentName,Relation</code><br>
+            Example: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;">211EC001,9876543210,Mr. Kumar,Father</code>
+          </p>
+          <textarea id="bulkImportText" rows="8"
+            style="width:100%;padding:10px;border:2px solid var(--border);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.8rem;outline:none;resize:vertical;"
+            placeholder="211EC001,9876543210,Mr. Ramesh Kumar,Father&#10;211EC002,8765432109,Mrs. Priya Sharma,Mother&#10;..."></textarea>
+          <div style="display:flex;gap:10px;margin-top:10px;">
+            <button class="btn btn-primary" onclick="doBulkImport()">⬆ Import</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('bulkImportCard').style.display='none'">Cancel</button>
+          </div>
+          <div id="bulkImportResult" style="margin-top:10px;font-size:.82rem;"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: SEND SMS -->
+      <div id="sms-smsSend" class="tab-panel">
+        <div class="card">
+          <div class="card-title">📤 Send SMS Alerts</div>
+
+          <!-- Quick send to low-attendance batch -->
+          <div style="background:linear-gradient(135deg,#fff8e1,#fff3e0);border:2px solid #ffcc80;border-radius:10px;padding:16px;margin-bottom:16px;">
+            <div style="font-weight:700;color:#e65100;margin-bottom:6px;">⚡ Quick Batch Send — Low Attendance Students</div>
+            <p style="font-size:.82rem;color:#5d4037;margin-bottom:10px;">
+              Automatically sends the selected template to all students below 85% who have a registered parent mobile.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <select id="batchTemplate" style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none;">
+                <option value="en">English Template</option>
+                <option value="ta">Tamil Template</option>
+                <option value="both">Both (English + Tamil)</option>
+              </select>
+              <button class="btn btn-gold" onclick="sendBatchSMS()">📱 Send to All Low-Att Parents</button>
+            </div>
+            <div id="batchSendPreview" style="margin-top:10px;"></div>
+          </div>
+
+          <!-- Individual send -->
+          <div class="card-title" style="margin-top:4px;">Send to Individual Student</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:600px;margin-bottom:14px;">
+            <div class="form-group">
+              <label>Student</label>
+              <select id="smsStudent" onchange="onSMSStudentChange()"
+                style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;">
+                <option value="">Select Student</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Template</label>
+              <select id="indivTemplate" onchange="onSMSStudentChange()" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;">
+                <option value="en">English</option>
+                <option value="ta">Tamil</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+          </div>
+          <!-- Student info preview card -->
+          <div id="smsStudentPreview" style="display:none;background:var(--bg);border-radius:10px;padding:14px;margin-bottom:14px;max-width:600px;">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+              <div style="flex:1;">
+                <div style="font-weight:700;" id="prev_name">--</div>
+                <div style="font-size:.78rem;color:var(--muted);" id="prev_roll">--</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:.72rem;color:var(--muted);">Attendance</div>
+                <span class="pct-badge" id="prev_pct">--%</span>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:.72rem;color:var(--muted);">Parent Mobile</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:600;" id="prev_mobile">--</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:.72rem;color:var(--muted);">Relation</div>
+                <div style="font-size:.82rem;" id="prev_relation">--</div>
+              </div>
+            </div>
+          </div>
+          <!-- Message preview -->
+          <div id="smsMessagePreview" style="display:none;margin-bottom:14px;max-width:600px;"></div>
+          <button class="btn btn-success" onclick="sendSMS()" id="btnSendSMS" disabled>📤 Send SMS</button>
+          <p style="font-size:.72rem;color:var(--muted);margin-top:6px;">
+            ⚠️ In a live deployment, this would trigger an SMS gateway (e.g. Twilio, MSG91). Currently logs to Sent Log.</p>
+        </div>
+      </div>
+
+      <!-- TAB 3: TEMPLATES -->
+      <div id="sms-smsTemplates" class="tab-panel">
+        <div class="card">
+          <div class="card-title">✏️ Message Templates
+            <button class="btn btn-sm btn-primary" style="margin-left:auto;" onclick="saveTemplates()">💾 Save Templates</button>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px;">
+            Use placeholders: <code style="background:var(--bg);padding:2px 5px;border-radius:4px;">{name}</code>
+            <code style="background:var(--bg);padding:2px 5px;border-radius:4px;">{roll}</code>
+            <code style="background:var(--bg);padding:2px 5px;border-radius:4px;">{pct}</code>
+            <code style="background:var(--bg);padding:2px 5px;border-radius:4px;">{parent}</code>
+          </p>
+          <div class="form-group">
+            <label>🇬🇧 English Template</label>
+            <textarea id="tmplEN" rows="5" oninput="renderTemplatePreview()" style="width:100%;padding:10px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none;resize:vertical;line-height:1.6;"></textarea>
+          </div>
+          <div class="form-group" style="margin-top:10px;">
+            <label>🇮🇳 Tamil Template (தமிழ்)</label>
+            <textarea id="tmplTA" rows="5" oninput="renderTemplatePreview()" style="width:100%;padding:10px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none;resize:vertical;line-height:1.6;"></textarea>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="card-title" style="font-size:.9rem;">Preview (fill with sample data)</div>
+            <div id="templatePreview" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: SENT LOG -->
+      <div id="sms-smsHistory" class="tab-panel">
+        <div class="card">
+          <div class="card-title">📋 SMS Sent Log
+            <button class="btn btn-sm btn-danger" style="margin-left:auto;"
+              onclick="if(confirm('Clear SMS log?')){DB.set('sms_log',[]);initSMSPage();}">🗑 Clear Log</button>
+          </div>
+          <div id="smsSentLog"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= ADMIN ======= -->
+    <div id="page-admin" class="page">
+      <div class="section-title">⚙️ Admin Panel</div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('adm','admFaculty')">Faculty</button>
+        <button class="tab-btn" onclick="switchTab('adm','admHoliday')">Holidays</button>
+        <button class="tab-btn" onclick="switchTab('adm','admEdit')">Edit Attendance</button>
+        <button class="tab-btn" onclick="switchTab('adm','admReset')">Reset / Backup</button>
+      </div>
+      <div id="adm-admFaculty" class="tab-panel active">
+        <div class="card"><div class="card-title">Faculty Accounts</div><div id="facultyListContent"></div></div>
+      </div>
+      <div id="adm-admHoliday" class="tab-panel">
+        <div class="card">
+          <div class="card-title">Holiday Management</div>
+          <div class="toolbar">
+            <input type="date" id="holDate"/>
+            <input type="text" id="holName" placeholder="Holiday Name (e.g. Pongal)"/>
+            <button class="btn btn-holiday" onclick="addHoliday()">+ Add Holiday</button>
+          </div>
+          <div id="holidayListContent"></div>
+        </div>
+      </div>
+      <div id="adm-admEdit" class="tab-panel">
+        <div class="card">
+          <div class="card-title">✏️ Edit Saved Attendance (Class Advisor Only)</div>
+          <div class="toolbar">
+            <input type="date" id="editDate"/>
+            <select id="editStudent" style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;min-width:180px;">
+              <option value="">Select Student</option>
+            </select>
+            <button class="btn btn-primary" onclick="loadEditAttendance()">Load</button>
+          </div>
+          <div id="editAttContent"></div>
+        </div>
+      </div>
+      <div id="adm-admReset" class="tab-panel">
+        <div class="card">
+          <div class="card-title">Data Management</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-secondary" onclick="backupData()">⬇ Backup Data</button>
+            <button class="btn btn-danger" onclick="if(confirm('Reset ALL attendance data?'))resetData()">🗑 Reset Attendance Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== MODAL ====== -->
+<div id="modalOverlay" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <h3 id="modalTitle">Confirm</h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- ====== TOAST ====== -->
+<div id="toast"></div>
+
+<script>
+// ===================================================================
+//  DATABASE (localStorage)
+// ===================================================================
+const DB = {
+  get(k){try{return JSON.parse(localStorage.getItem('sece_'+k)||'null')}catch{return null}},
+  set(k,v){localStorage.setItem('sece_'+k,JSON.stringify(v))},
+  del(k){localStorage.removeItem('sece_'+k)}
+};
+
+// ===================================================================
+//  INIT DATA
+// ===================================================================
+function initData(){
+  if(!DB.get('initialized')){
+    DB.set('students', generateStudents());
+    DB.set('courses', [
+      {code:'EC8301',name:'Digital Circuits & Design',faculty:'faculty_ec8301'},
+      {code:'EC8302',name:'Signals & Systems',faculty:'faculty_ec8302'},
+      {code:'EC8303',name:'Analog Communication',faculty:'faculty_ec8303'},
+      {code:'EC8304',name:'Electromagnetic Theory',faculty:'faculty_ec8304'},
+      {code:'EC8305',name:'Electronic Devices & Circuits',faculty:'faculty_ec8305'},
+      {code:'EC8311',name:'Analog Circuits Lab',faculty:'faculty_ec8311'},
+      {code:'EC8312',name:'Digital Lab',faculty:'faculty_ec8312'},
+    ]);
+    DB.set('timetable', {
+      Mon:[{course:'EC8301',faculty:'faculty_ec8301'},{course:'EC8302',faculty:'faculty_ec8302'},
+           {course:'EC8303',faculty:'faculty_ec8303'},{course:'EC8304',faculty:'faculty_ec8304'},
+           {course:'EC8305',faculty:'faculty_ec8305'},{course:'EC8311',faculty:'faculty_ec8311'},{course:'EC8312',faculty:'faculty_ec8312'}],
+      Tue:[{course:'EC8302',faculty:'faculty_ec8302'},{course:'EC8301',faculty:'faculty_ec8301'},
+           {course:'EC8304',faculty:'faculty_ec8304'},{course:'EC8303',faculty:'faculty_ec8303'},
+           {course:'EC8305',faculty:'faculty_ec8305'},{course:'EC8311',faculty:'faculty_ec8311'},{course:'EC8312',faculty:'faculty_ec8312'}],
+      Wed:[{course:'EC8303',faculty:'faculty_ec8303'},{course:'EC8305',faculty:'faculty_ec8305'},
+           {course:'EC8301',faculty:'faculty_ec8301'},{course:'EC8302',faculty:'faculty_ec8302'},
+           {course:'EC8304',faculty:'faculty_ec8304'},{course:'EC8311',faculty:'faculty_ec8311'},{course:'EC8312',faculty:'faculty_ec8312'}],
+      Thu:[{course:'EC8304',faculty:'faculty_ec8304'},{course:'EC8303',faculty:'faculty_ec8303'},
+           {course:'EC8302',faculty:'faculty_ec8302'},{course:'EC8305',faculty:'faculty_ec8305'},
+           {course:'EC8301',faculty:'faculty_ec8301'},{course:'EC8311',faculty:'faculty_ec8311'},{course:'EC8312',faculty:'faculty_ec8312'}],
+      Fri:[{course:'EC8305',faculty:'faculty_ec8305'},{course:'EC8304',faculty:'faculty_ec8304'},
+           {course:'EC8303',faculty:'faculty_ec8303'},{course:'EC8301',faculty:'faculty_ec8301'},
+           {course:'EC8302',faculty:'faculty_ec8302'},{course:'EC8311',faculty:'faculty_ec8311'},{course:'EC8312',faculty:'faculty_ec8312'}],
+      Sat:[{course:'EC8311',faculty:'faculty_ec8311'},{course:'EC8311',faculty:'faculty_ec8311'},
+           {course:'EC8312',faculty:'faculty_ec8312'},{course:'EC8312',faculty:'faculty_ec8312'},
+           {course:'EC8301',faculty:'faculty_ec8301'},{course:'EC8302',faculty:'faculty_ec8302'},{course:'EC8303',faculty:'faculty_ec8303'}],
+    });
+    DB.set('attendance',{});// {date:{period:{rollno:status}}}
+    DB.set('saved_periods',{});// {date:[1,2,...]}
+    DB.set('holidays',{});// {date:name}
+    DB.set('sms_log',[]);
+    DB.set('faculty_accounts',{
+      advisor:{name:'Dr. A. Babu Karuppiah',role:'Class Advisor',periods:'all'},
+      tutor1:{name:'Dr. Anandhakumar',role:'Tutor',periods:'all'},
+      tutor2:{name:'Ms. Faridha Banu',role:'Tutor',periods:'all'},
+      faculty_ec8301:{name:'EC8301 Faculty',role:'Faculty',periods:'byTT'},
+      faculty_ec8302:{name:'EC8302 Faculty',role:'Faculty',periods:'byTT'},
+      faculty_ec8303:{name:'EC8303 Faculty',role:'Faculty',periods:'byTT'},
+      faculty_ec8304:{name:'EC8304 Faculty',role:'Faculty',periods:'byTT'},
+      faculty_ec8305:{name:'EC8305 Faculty',role:'Faculty',periods:'byTT'},
+      faculty_ec8311:{name:'EC8311 Lab Faculty',role:'Faculty',periods:'byTT'},
+      faculty_ec8312:{name:'EC8312 Lab Faculty',role:'Faculty',periods:'byTT'},
+    });
+    DB.set('initialized',true);
+  }
+}
+
+function generateStudents(){
+  const firstNames=['Aarav','Arjun','Karthik','Surya','Dinesh','Ravi','Priya','Sneha','Meena',
+    'Divya','Raj','Vignesh','Lakshmi','Anand','Bharath','Chetan','Deepak','Elan','Farid','Gopal',
+    'Harini','Ilavarasan','Janani','Kalaivani','Logesh','Muthu','Nandha','Oviya','Pari','Ramesh',
+    'Sakthi','Tamil','Usha','Varun','Warishan','Xavier','Yazhini','Zara','Abirami','Balaji',
+    'Chithra','Durga','Ezhil','Fathima','Ganesh','Hema','Indra','Jothi','Kavitha','Lalitha',
+    'Mani','Nandhini','Ojas','Pavithra','Ranjith','Saravanan','Thilaga','Uma','Venkat','Wasim',
+    'Abinaya','Bhuvanesh','Chaitra','Durai','Elango','Faisal','Geetha','Harish','Ilakkiya','Jenifer'];
+  const mobiles=['9876543210','8765432109','7654321098','9988776655','8877665544',
+    '9900112233','8811223344','7722334455','9933445566','8844556677'];
+  return firstNames.slice(0,75).map((n,i)=>({
+    roll:`211EC${String(i+1).padStart(3,'0')}`,
+    name:n+' '+(i%2===0?'Kumar':'Devi'),
+    mobile:mobiles[i%10],
+    email:`${n.toLowerCase()}${i+1}@student.sece.ac.in`
+  }));
+}
+
+// ===================================================================
+//  AUTH
+// ===================================================================
+let currentUser=null;
+function doLogin(){
+  const role=document.getElementById('loginRole').value;
+  const pass=document.getElementById('loginPass').value;
+  if(!role){toast('Please select a role','error');return;}
+  if(pass!=='1234'){toast('Incorrect password','error');return;}
+  currentUser=role;
+  const accts=DB.get('faculty_accounts');
+  document.getElementById('currentUserLabel').textContent=accts[role]?.name||role;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='block';
+  if(role==='advisor'){
+    document.getElementById('navAdmin').style.display='';
+  }
+  initPageData();
+  showPage('dashboard');
+  toast(`Welcome, ${accts[role]?.name||role}!`,'success');
+}
+function doLogout(){
+  currentUser=null;
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginRole').value='';
+  document.getElementById('loginPass').value='1234';
+}
+
+// ===================================================================
+//  NAVIGATION
+// ===================================================================
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const pg=document.getElementById('page-'+name);
+  if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.getAttribute('onclick')?.includes(name))b.classList.add('active');
+  });
+  if(name==='dashboard')renderDashboard();
+  if(name==='attendance')initAttendancePage();
+  if(name==='history')initHistoryPage();
+  if(name==='report')initReportPage();
+  if(name==='lowatt')loadLowAtt();
+  if(name==='daily')initDailyPage();
+  if(name==='timetable')initTimetablePage();
+  if(name==='students')renderStudentList();
+  if(name==='sms')initSMSPage();
+  if(name==='admin')initAdminPage();
+}
+
+function switchTab(group,id){
+  document.querySelectorAll(`[id^="${group}-"]`).forEach(p=>p.classList.remove('active'));
+  document.getElementById(`${group}-${id}`).classList.add('active');
+  const panels=document.getElementById(`${group}-${id}`).closest('.page');
+  if(panels)panels.querySelectorAll('.tab-btn').forEach((b,i,arr)=>{
+    b.classList.toggle('active',b.getAttribute('onclick')?.includes(id));
+  });
+}
+
+function initPageData(){
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('attDate').value=today;
+  document.getElementById('dailyDate').value=today;
+  document.getElementById('editDate').value=today;
+  const stEl=document.getElementById('histStudent');
+  const stEl2=document.getElementById('editStudent');
+  const stEl3=document.getElementById('smsStudent');
+  const repCourse=document.getElementById('repCourse');
+  const students=DB.get('students')||[];
+  students.forEach(s=>{
+    [stEl,stEl2,stEl3].forEach(el=>{
+      const o=document.createElement('option');
+      o.value=s.roll;o.textContent=`${s.roll} – ${s.name}`;
+      el.appendChild(o);
+    });
+  });
+  const courses=DB.get('courses')||[];
+  courses.forEach(c=>{
+    const o=document.createElement('option');
+    o.value=c.code;o.textContent=`${c.code} – ${c.name}`;
+    repCourse.appendChild(o);
+  });
+  // set history date range
+  const from=new Date();from.setMonth(from.getMonth()-1);
+  document.getElementById('histFrom').value=from.toISOString().split('T')[0];
+  document.getElementById('histTo').value=today;
+  document.getElementById('repFrom').value=from.toISOString().split('T')[0];
+  document.getElementById('repTo').value=today;
+  document.getElementById('holDate').value=today;
+}
+
+// ===================================================================
+//  DASHBOARD
+// ===================================================================
+function renderDashboard(){
+  const students=DB.get('students')||[];
+  const att=DB.get('attendance')||{};
+  const hol=DB.get('holidays')||{};
+  const dates=Object.keys(att).filter(d=>!hol[d]);
+  const totalDays=dates.length;
+
+  let totalLow=0,presentToday=0;
+  const today=new Date().toISOString().split('T')[0];
+  students.forEach(s=>{
+    const p=calcStudentPct(s.roll);
+    if(p<85&&p>0)totalLow++;
+  });
+
+  const todayAtt=att[today]||{};
+  const periods=Object.keys(todayAtt);
+  if(periods.length){
+    const firstPeriod=todayAtt[periods[0]]||{};
+    presentToday=Object.values(firstPeriod).filter(v=>v==='P').length;
+  }
+
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-card"><div class="stat-value">${students.length}</div><div class="stat-label">Total Students</div></div>
+    <div class="stat-card gold"><div class="stat-value">${totalDays}</div><div class="stat-label">Working Days</div></div>
+    <div class="stat-card rose"><div class="stat-value">${totalLow}</div><div class="stat-label">Low Attendance</div></div>
+    <div class="stat-card green"><div class="stat-value">${presentToday}</div><div class="stat-label">Present Today</div></div>
+    <div class="stat-card orange"><div class="stat-value">${Object.keys(hol).length}</div><div class="stat-label">Holidays</div></div>
+  `;
+
+  // Recent activity
+  const saved=DB.get('saved_periods')||{};
+  const recentDates=Object.keys(saved).sort().reverse().slice(0,5);
+  document.getElementById('recentActivity').innerHTML=recentDates.length?
+    recentDates.map(d=>`<div>📅 <strong>${d}</strong> – Periods ${saved[d].join(', ')} saved</div>`).join('')
+    :'<span>No attendance recorded yet.</span>';
+
+  // Low att students
+  const lowStudents=students.filter(s=>calcStudentPct(s.roll)<85&&calcStudentPct(s.roll)>0).slice(0,6);
+  document.getElementById('dashLowAtt').innerHTML=lowStudents.length?
+    lowStudents.map(s=>{const p=calcStudentPct(s.roll);return`
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div style="flex:1;font-size:.82rem;"><strong>${s.name}</strong><br><span style="font-size:.72rem;color:var(--muted);">${s.roll}</span></div>
+        <span class="pct-badge pct-low">${p.toFixed(1)}%</span>
+        <span class="att-alert-chip">⚠️ Low</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill pf-low" style="width:${p}%"></div></div>
+    `}).join('')
+    :'<span style="color:var(--muted);font-size:.85rem;">All students have good attendance! ✅</span>';
+}
+
+// ===================================================================
+//  ATTENDANCE CALCULATION
+// ===================================================================
+function calcStudentPct(roll){
+  const att=DB.get('attendance')||{};
+  const hol=DB.get('holidays')||{};
+  let totalPeriods=0,absentPeriods=0,leavePeriods=0;
+
+  Object.keys(att).forEach(date=>{
+    if(hol[date])return;
+    const dayAtt=att[date];
+    Object.keys(dayAtt).forEach(period=>{
+      const status=dayAtt[period][roll];
+      if(status===undefined)return;
+      totalPeriods++;
+      if(status==='A')absentPeriods++;
+      else if(status==='L')leavePeriods++;
+    });
+  });
+
+  if(totalPeriods===0)return 0;
+  // Present = totalPeriods - absentPeriods - leavePeriods (OD counts as present)
+  // Absent penalty: each absent period counts as 2 for deduction
+  // Leave penalty: each leave period counts as 1
+  // Session rules applied per day
+  const attDays=getEffectiveDayAttendance(roll);
+  if(attDays.total===0)return 0;
+  return Math.max(0,(attDays.total-attDays.absentDeduction-attDays.leaveDeduction)/attDays.total*100);
+}
+
+function getEffectiveDayAttendance(roll){
+  const att=DB.get('attendance')||{};
+  const hol=DB.get('holidays')||{};
+  let total=0,absentDeduction=0,leaveDeduction=0;
+
+  Object.keys(att).forEach(date=>{
+    if(hol[date])return;
+    const dayAtt=att[date];
+    // Group periods into forenoon (1-4) and afternoon (5-7)
+    let fnStatuses=[],anStatuses=[];
+    for(let p=1;p<=4;p++){
+      const st=dayAtt[p]?.[roll];
+      if(st!==undefined)fnStatuses.push(st);
+    }
+    for(let p=5;p<=7;p++){
+      const st=dayAtt[p]?.[roll];
+      if(st!==undefined)anStatuses.push(st);
+    }
+
+    const hasAny=(arr)=>arr.length>0;
+    if(!hasAny(fnStatuses)&&!hasAny(anStatuses))return;
+
+    // Count sessions attended
+    if(hasAny(fnStatuses))total++;
+    if(hasAny(anStatuses))total++;
+
+    // Absent rule: any A in FN session = 1 full session absent (×2 penalty)
+    const fnHasA=fnStatuses.some(s=>s==='A');
+    const anHasA=anStatuses.some(s=>s==='A');
+    const fnHasL=fnStatuses.some(s=>s==='L')&&!fnHasA;
+    const anHasL=anStatuses.some(s=>s==='L')&&!anHasA;
+
+    if(fnHasA)absentDeduction+=2;// double penalty
+    if(anHasA)absentDeduction+=2;
+    if(fnHasL)leaveDeduction+=0.5;// half day
+    if(anHasL)leaveDeduction+=0.5;
+  });
+
+  return{total,absentDeduction,leaveDeduction};
+}
+
+function calcStudentStats(roll){
+  const att=DB.get('attendance')||{};
+  const hol=DB.get('holidays')||{};
+  let present=0,absent=0,leave=0,od=0,total=0;
+  Object.keys(att).forEach(date=>{
+    if(hol[date])return;
+    const dayAtt=att[date];
+    Object.keys(dayAtt).forEach(p=>{
+      const st=dayAtt[p][roll];
+      if(st===undefined)return;
+      total++;
+      if(st==='P')present++;
+      else if(st==='A')absent++;
+      else if(st==='L')leave++;
+      else if(st==='OD')od++;
+    });
+  });
+  return{present,absent,leave,od,total};
+}
+
+// ===================================================================
+//  ATTENDANCE PAGE
+// ===================================================================
+let selectedPeriods=[];
+function initAttendancePage(){
+  const date=document.getElementById('attDate').value||new Date().toISOString().split('T')[0];
+  document.getElementById('attDate').value=date;
+  onDateChange();
+}
+
+function onDateChange(){
+  const date=document.getElementById('attDate').value;
+  if(!date)return;
+  selectedPeriods=[];
+  renderPeriodSelector(date);
+  document.getElementById('attTableCard').style.display='none';
+  document.getElementById('btnSave').style.display='none';
+
+  // Check holiday
+  const hol=DB.get('holidays')||{};
+  const holBanner=document.getElementById('holidayBanner');
+  if(hol[date]){
+    holBanner.style.display='';
+    document.getElementById('holidayName').textContent=hol[date];
+  } else {
+    holBanner.style.display='none';
+  }
+}
+
+function getDayOfWeek(dateStr){
+  const d=new Date(dateStr+'T00:00:00');
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return days[d.getDay()];
+}
+
+function renderPeriodSelector(date){
+  const tt=DB.get('timetable')||{};
+  const dow=getDayOfWeek(date);
+  const dayTT=tt[dow]||[];
+  const saved=DB.get('saved_periods')||{};
+  const savedToday=saved[date]||[];
+  const hol=DB.get('holidays')||{};
+  const isHoliday=!!hol[date];
+  const periodNames=['P1','P2','P3','P4','P5','P6','P7'];
+  const sessionLabel=['FN','FN','FN','FN','AN','AN','AN'];
+
+  const container=document.getElementById('periodSelector');
+  container.innerHTML='';
+
+  // Add session labels
+  const fnLabel=document.createElement('div');
+  fnLabel.className='forenoon-label';fnLabel.textContent='Forenoon:';
+  container.appendChild(fnLabel);
+
+  for(let i=0;i<7;i++){
+    if(i===4){
+      const anLabel=document.createElement('div');
+      anLabel.className='afternoon-label';anLabel.textContent='Afternoon:';
+      container.appendChild(anLabel);
+    }
+    const chip=document.createElement('div');
+    chip.className='period-chip';
+    const periodInfo=dayTT[i]||{course:'--',faculty:'--'};
+    const courses=DB.get('courses')||[];
+    const courseObj=courses.find(c=>c.code===periodInfo.course);
+    const courseName=courseObj?courseObj.name.split(' ').slice(0,2).join(' '):'--';
+
+    chip.innerHTML=`<strong>${periodNames[i]}</strong><span class="period-tag">${periodInfo.course||'--'}</span><span class="period-tag" style="font-size:.62rem;">${courseName}</span>`;
+
+    if(isHoliday){
+      chip.classList.add('holiday-period');
+    } else if(savedToday.includes(i+1)){
+      chip.classList.add('saved');
+      chip.title='Already saved';
+    } else {
+      // Permission check
+      const canEnter=canEnterPeriod(i+1,date);
+      if(!canEnter){
+        chip.classList.add('disabled');
+        chip.title='Not assigned to you';
+      } else {
+        chip.onclick=()=>togglePeriod(i+1,chip);
+      }
+    }
+    container.appendChild(chip);
+  }
+
+  // Info
+  const info=document.getElementById('periodInfo');
+  info.textContent=isHoliday?'🎉 Holiday – Attendance cannot be entered.':
+    `Day: ${dow} | Saved: ${savedToday.length}/7 periods`;
+}
+
+function canEnterPeriod(period,date){
+  if(!currentUser)return false;
+  if(currentUser==='advisor'||currentUser==='tutor1'||currentUser==='tutor2')return true;
+  const tt=DB.get('timetable')||{};
+  const dow=getDayOfWeek(date);
+  const dayTT=tt[dow]||[];
+  const slot=dayTT[period-1]||{};
+  return slot.faculty===currentUser;
+}
+
+function togglePeriod(period,chip){
+  const idx=selectedPeriods.indexOf(period);
+  if(idx>=0){selectedPeriods.splice(idx,1);chip.classList.remove('selected');}
+  else{selectedPeriods.push(period);chip.classList.add('selected');}
+  document.getElementById('btnSave').style.display=selectedPeriods.length?'':'none';
+}
+
+function loadAttendanceTable(){
+  const date=document.getElementById('attDate').value;
+  if(!date){toast('Select a date first','error');return;}
+  const hol=DB.get('holidays')||{};
+  if(hol[date]){toast('This is a holiday!','error');return;}
+  if(selectedPeriods.length===0){toast('Select at least one period','error');return;}
+  renderAttendanceTable(date);
+}
+
+function renderAttendanceTable(date){
+  const students=DB.get('students')||[];
+  const att=DB.get('attendance')||{};
+  const saved=DB.get('saved_periods')||{};
+  const savedToday=saved[date]||[];
+
+  document.getElementById('attTableCard').style.display='';
+  document.getElementById('attDateLabel').textContent=`Date: ${date}`;
+  document.getElementById('btnSave').style.display='';
+
+  // Period headers
+  const phEl=document.getElementById('periodHeaders');
+  phEl.innerHTML=selectedPeriods.map(p=>`<th>P${p}</th>`).join('');
+
+  const tbody=document.getElementById('attTableBody');
+  tbody.innerHTML='';
+
+  // Ensure att[date] exists
+  if(!att[date])att[date]={};
+  selectedPeriods.forEach(p=>{if(!att[date][p])att[date][p]={};});
+
+  students.forEach((s,idx)=>{
+    const tr=document.createElement('tr');
+    const pct=calcStudentPct(s.roll);
+    const pctClass=pct>=85?'pct-high':pct>=75?'pct-mid':'pct-low';
+
+    let cells=selectedPeriods.map(p=>{
+      const isSaved=savedToday.includes(p);
+      const curStatus=att[date][p][s.roll]||'P';
+      if(!att[date][p][s.roll])att[date][p][s.roll]='P';// default present
+      const disabled=isSaved?'disabled':'';
+      return `<td><div class="att-btn-group">
+        <button class="att-btn btn-P ${curStatus==='P'?'active-P':''}" ${disabled}
+          onclick="setAtt('${date}',${p},'${s.roll}','P',this)">P</button>
+        <button class="att-btn btn-A ${curStatus==='A'?'active-A':''}" ${disabled}
+          onclick="setAtt('${date}',${p},'${s.roll}','A',this)">A</button>
+        <button class="att-btn btn-L ${curStatus==='L'?'active-L':''}" ${disabled}
+          onclick="setAtt('${date}',${p},'${s.roll}','L',this)">L</button>
+        <button class="att-btn btn-OD ${curStatus==='OD'?'active-OD':''}" ${disabled}
+          onclick="setAtt('${date}',${p},'${s.roll}','OD',this)">OD</button>
+      </div></td>`;
+    }).join('');
+
+    tr.innerHTML=`
+      <td class="sno">${idx+1}</td>
+      <td class="sroll">${s.roll}</td>
+      <td class="sname">${s.name}</td>
+      ${cells}
+      <td><span class="pct-badge ${pctClass}">${pct>0?pct.toFixed(1)+'%':'--'}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  DB.set('attendance',att);
+}
+
+function setAtt(date,period,roll,status,btn){
+  const att=DB.get('attendance')||{};
+  if(!att[date])att[date]={};
+  if(!att[date][period])att[date][period]={};
+  att[date][period][roll]=status;
+  DB.set('attendance',att);
+
+  // Update buttons in row
+  const row=btn.closest('tr');
+  const periodIdx=selectedPeriods.indexOf(parseInt(period));
+  // find all buttons in this cell
+  const cells=row.querySelectorAll('td');
+  // period cells start at index 3
+  const cellIdx=3+periodIdx;
+  if(cells[cellIdx]){
+    cells[cellIdx].querySelectorAll('.att-btn').forEach(b=>{
+      const bStatus=b.classList.contains('btn-P')?'P':b.classList.contains('btn-A')?'A':b.classList.contains('btn-L')?'L':'OD';
+      b.className=`att-btn btn-${bStatus}${bStatus===status?' active-'+bStatus:''}`;
+    });
+  }
+
+  // Update pct badge
+  const lastCell=row.querySelector('td:last-child span');
+  if(lastCell){
+    const pct=calcStudentPct(roll);
+    const pc=pct>=85?'pct-high':pct>=75?'pct-mid':'pct-low';
+    lastCell.className=`pct-badge ${pc}`;
+    lastCell.textContent=pct>0?pct.toFixed(1)+'%':'--';
+  }
+}
+
+function markAll(status){
+  const date=document.getElementById('attDate').value;
+  const students=DB.get('students')||[];
+  const att=DB.get('attendance')||{};
+  if(!att[date])att[date]={};
+  selectedPeriods.forEach(p=>{
+    if(!att[date][p])att[date][p]={};
+    students.forEach(s=>att[date][p][s.roll]=status);
+  });
+  DB.set('attendance',att);
+  renderAttendanceTable(date);
+  toast(`All students marked ${status}`,'info');
+}
+
+function saveAttendance(){
+  const date=document.getElementById('attDate').value;
+  const saved=DB.get('saved_periods')||{};
+  if(!saved[date])saved[date]=[];
+  selectedPeriods.forEach(p=>{if(!saved[date].includes(p))saved[date].push(p);});
+  DB.set('saved_periods',saved);
+  toast(`Attendance saved for Period(s) ${selectedPeriods.join(', ')} on ${date}`,'success');
+  selectedPeriods=[];
+  renderPeriodSelector(date);
+  document.getElementById('attTableCard').style.display='none';
+  document.getElementById('btnSave').style.display='none';
+  // Check low attendance & suggest SMS
+  checkLowAttAlert();
+}
+
+function checkLowAttAlert(){
+  const students=DB.get('students')||[];
+  const low=students.filter(s=>{const p=calcStudentPct(s.roll);return p>0&&p<85;});
+  if(low.length>0){
+    toast(`⚠️ ${low.length} student(s) below 85% – Check Low Attendance page`,'error');
+  }
+}
+
+function markHoliday(){
+  const date=document.getElementById('attDate').value;
+  if(!date){toast('Select a date','error');return;}
+  showModal('Mark Holiday',`
+    <div class="form-group"><label>Holiday Name</label>
+    <input type="text" id="modalHolName" placeholder="e.g. Pongal, Diwali..." style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;"/></div>
+    <p style="font-size:.82rem;color:var(--muted);">Date: <strong>${date}</strong></p>
+  `,[
+    {label:'Cancel',cls:'btn-secondary',fn:closeModal},
+    {label:'Mark Holiday',cls:'btn-holiday',fn:()=>{
+      const name=document.getElementById('modalHolName').value.trim()||'Holiday';
+      const hol=DB.get('holidays')||{};
+      hol[date]=name;
+      DB.set('holidays',hol);
+      toast(`${date} marked as ${name}`,'success');
+      closeModal();
+      onDateChange();
+    }}
+  ]);
+}
+
+// ===================================================================
+//  HISTORY
+// ===================================================================
+function initHistoryPage(){
+  // already populated
+}
+
+function loadHistory(){
+  const roll=document.getElementById('histStudent').value;
+  const from=document.getElementById('histFrom').value;
+  const to=document.getElementById('histTo').value;
+  const att=DB.get('attendance')||{};
+  const hol=DB.get('holidays')||{};
+  const students=DB.get('students')||[];
+  const saved=DB.get('saved_periods')||{};
+
+  const dates=Object.keys(att).filter(d=>(!from||d>=from)&&(!to||d<=to)).sort();
+
+  if(roll){
+    // Single student history
+    const s=students.find(st=>st.roll===roll);
+    let html=`<h4 style="margin-bottom:12px;">History for ${s?.name} (${roll})</h4>
+    <div class="att-table-wrap"><table class="att-table">
+    <thead><tr><th class="left">Date</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th><th>%</th></tr></thead>
+    <tbody>`;
+    let runningPct=0;
+    dates.forEach(d=>{
+      if(hol[d]){
+        html+=`<tr><td class="left">${d}</td><td colspan="7" style="background:var(--holiday-bg);color:var(--holiday);font-weight:600;text-align:center;">${hol[d]} (Holiday)</td><td>--</td></tr>`;
+        return;
+      }
+      const dayAtt=att[d]||{};
+      let cells='';
+      for(let p=1;p<=7;p++){
+        const st=saved[d]?.includes(p)?dayAtt[p]?.[roll]||'-':'-';
+        const cls=st==='P'?'hc-P':st==='A'?'hc-A':st==='L'?'hc-L':st==='OD'?'hc-OD':'hc--';
+        cells+=`<td class="history-cell ${cls}">${st}</td>`;
+      }
+      const pct=calcStudentPct(roll);
+      const pc=pct>=85?'pct-high':pct>=75?'pct-mid':'pct-low';
+      html+=`<tr><td style="font-size:.8rem;padding:4px 8px;">${d}</td>${cells}
+        <td><span class="pct-badge ${pc}">${pct.toFixed(1)}%</span></td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+    document.getElementById('historyContent').innerHTML=html;
+  } else {
+    // All students summary table
+    let html=`<div class="att-table-wrap"><table class="att-table">
+    <thead><tr><th>#</th><th class="left">Roll</th><th class="left">Name</th><th>Present</th><th>Absent</th><th>Leave</th><th>OD</th><th>Attendance %</th></tr></thead><tbody>`;
+    students.forEach((s,i)=>{
+      const stats=calcStudentStats(s.roll);
+      const pct=calcStudentPct(s.roll);
+      const pc=pct>=85?'pct-high':pct>=75?'pct-mid':'pct-low';
+      const alertRow=pct>0&&pct<85?'low-att-row':'';
+      html+=`<tr class="${alertRow}">
+        <td class="sno">${i+1}</td>
+        <td class="sroll">${s.roll}</td>
+        <td class="sname">${s.name}${pct>0&&pct<85?'<span class="att-alert-chip">⚠️</span>':''}</td>
+        <td><span class="badge badge-present">${stats.present}</span></td>
+        <td><span class="badge badge-absent">${stats.absent}</span></td>
+        <td><span class="badge badge-leave">${stats.leave}</span></td>
+        <td><span class="badge badge-od">${stats.od}</span></td>
+        <td><span class="pct-badge ${pc}">${pct>0?pct.toFixed(1)+'%':'--'}</span>
+          <div class="progress-bar" style="margin-top:4px;width:80px;display:inline-block;vertical-align:middle;">
+            <div class="progress-fill ${pct>=85?'pf-high':pct>=75?'pf-mid':'pf-low'}" style="width:${pct}%"></div>
+          </div></td>
+      </tr>`;
+    });
+    html+=`</tbody></table></div>`;
+    document.getElementById('historyContent').innerHTML=html;
+  }
+}
+
+function exportHistoryCSV(){
+  const students=DB.get('students')||[];
+  const rows=[['Roll','Name','Present','Absent','Leave','OD','Attendance%']];
+  students.forEach(s=>{
+    const stats=calcStudentStats(s.roll);
+    const pct=calcStudentPct(s.roll);
+    rows.push([s.roll,s.name,stats.present,stats.absent,stats.leave,stats.od,pct.toFixed(1)+'%']);
+  });
+  downloadCSV(rows,'attendance_history.csv');
+}
+
+// ===================================================================
+//  REPORT
+// ===================================================================
+function initReportPage(){generateReport();}
+function generateReport(){
+  const from=document.getElementById('repFrom').value;
+  const to=document.getElementById('repTo').value;
+  const courseFilter=document.getElementById('repCourse').value;
+  const students=DB.get('students')||[];
+  const att=DB.get('attendance')||{};
+  const hol=DB.get('holidays')||{};
+  const saved=DB.get('saved_periods')||{};
+
+  let html=`<div class="att-table-wrap"><table class="att-table">
+  <thead><tr>
+    <th>#</th><th class="left">Roll No.</th><th class="left">Student Name</th>
+    <th>Total Periods</th><th>Present</th><th>Absent</th><th>Leave</th><th>OD</th>
+    <th>Eff. Deduction</th><th>Attendance %</th><th>Status</th>
+  </tr></thead><tbody>`;
+
+  students.forEach((s,i)=>{
+    const stats=calcStudentStats(s.roll);
+    const pct=calcStudentPct(s.roll);
+    const eff=getEffectiveDayAttendance(s.roll);
+    const pc=pct>=85?'pct-high':pct>=75?'pct-mid':'pct-low';
+    const status=pct>=85?'<span class="badge badge-present">Good</span>':
+      pct>=75?'<span class="badge badge-leave">Average</span>':
+      '<span class="badge badge-absent">Critical ⚠️</span>';
+    const alertRow=pct>0&&pct<85?'low-att-row':'';
+    html+=`<tr class="${alertRow}">
+      <td class="sno">${i+1}</td>
+      <td class="sroll">${s.roll}</td>
+      <td class="sname">${s.name}</td>
+      <td>${stats.total}</td>
+      <td><span class="badge badge-present">${stats.present}</span></td>
+      <td><span class="badge badge-absent">${stats.absent}</span></td>
+      <td><span class="badge badge-leave">${stats.leave}</span></td>
+      <td><span class="badge badge-od">${stats.od}</span></td>
+      <td style="font-size:.78rem;">${eff.absentDeduction.toFixed(1)} abs + ${eff.leaveDeduction.toFixed(1)} lv</td>
+      <td><span class="pct-badge ${pc}">${pct>0?pct.toFixed(1)+'%':'N/A'}</span></td>
+      <td>${status}</td>
+    </tr>`;
+  });
+
+  html+=`</tbody></table></div>`;
+  document.getElementById('reportContent').innerHTML=html;
+}
+
+function exportReportCSV(){
+  const students=DB.get('students')||[];
+  const rows=[['Roll','Name','Total','Present','Absent','Leave','OD','Attendance%']];
+  students.forEach(s=>{
+    const stats=calcStudentStats(s.roll);
+    const pct=calcStudentPct(s.roll);
+    rows.push([s.roll,s.name,stats.total,stats.present,stats.absent,stats.leave,stats.od,pct.toFixed(1)+'%']);
+  });
+  downloadCSV(rows,'consolidated_report.csv');
+}
+
+// ===================================================================
+//  LOW ATTENDANCE
+// ===================================================================
+function loadLowAtt(){
+  const students=DB.get('students')||[];
+  const low=students.filter(s=>{const p=calcStudentPct(s.roll);return p>0&&p<85;});
+
+  if(low.length===0){
+    document.getElementById('lowAttContent').innerHTML='<div style="text-align:center;color:var(--green);padding:30px;font-size:1rem;">✅ All students have attendance ≥ 85%! Great job!</div>';
+    return;
+  }
+
+  let html=`<div class="att-table-wrap"><table class="att-table">
+  <thead><tr><th>#</th><th class="left">Roll</th><th class="left">Name</th><th>Parent Mobile</th>
+    <th>Present</th><th>Absent</th><th>Leave</th><th>Attendance %</th><th>Action</th></tr></thead><tbody>`;
+
+  low.forEach((s,i)=>{
+    const stats=calcStudentStats(s.roll);
+    const pct=calcStudentPct(s.roll);
+    html+=`<tr class="low-att-row">
+      <td class="sno">${i+1}</td>
+      <td class="sroll">${s.roll}</td>
+      <td class="sname">${s.name}<span class="att-alert-chip">⚠️ Low</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${s.mobile||'--'}</td>
+      <td><span class="badge badge-present">${stats.present}</span></td>
+      <td><span class="badge badge-absent">${stats.absent}</span></td>
+      <td><span class="badge badge-leave">${stats.leave}</span></td>
+      <td><span class="pct-badge pct-low">${pct.toFixed(1)}%</span>
+        <div class="progress-bar" style="width:80px;display:inline-block;vertical-align:middle;margin-left:6px;">
+          <div class="progress-fill pf-low" style="width:${pct}%"></div>
+        </div>
+      </td>
+      <td><button class="btn btn-sm btn-gold" onclick="sendSMSFor('${s.roll}')">📱 SMS</button></td>
+    </tr>`;
+  });
+
+  html+=`</tbody></table></div>`;
+  document.getElementById('lowAttContent').innerHTML=html;
+}
+
+function sendAllSMS(){
+  const students=DB.get('students')||[];
+  const db=DB.get('parent_db')||{};
+  const low=students.filter(s=>{const p=calcStudentPct(s.roll);return p>0&&p<85;});
+  let sent=0,skipped=0;
+  low.forEach(s=>{
+    const e=db[s.roll]||{};
+    if(!e.mobile&&!s.mobile){skipped++;return;}
+    sendSMSFor(s.roll,true);sent++;
+  });
+  toast(`📱 SMS sent to ${sent} parent(s)${skipped?` | ${skipped} skipped (no mobile)`:''}`,sent?'success':'error');
+}
+
+
+// ===================================================================
+//  DAILY SUMMARY
+// ===================================================================
+function initDailyPage(){
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('dailyDate').value=today;
+  loadDailySummary();
+}
+
+function loadDailySummary(){
+  const date=document.getElementById('dailyDate').value;
+  if(!date)return;
+  const att=DB.get('attendance')||{};
+  const hol=DB.get('holidays')||{};
+  const saved=DB.get('saved_periods')||{};
+  const students=DB.get('students')||[];
+
+  if(hol[date]){
+    document.getElementById('dailyContent').innerHTML=`<div class="holiday-banner">🎉 ${date} is a Holiday: <strong>${hol[date]}</strong></div>`;
+    return;
+  }
+
+  const dayAtt=att[date]||{};
+  const savedPeriods=saved[date]||[];
+
+  if(savedPeriods.length===0){
+    document.getElementById('dailyContent').innerHTML='<div style="color:var(--muted);padding:20px;text-align:center;">No attendance recorded for this date.</div>';
+    return;
+  }
+
+  // Per-period summary
+  let html=`<div class="stats-grid">`;
+  savedPeriods.forEach(p=>{
+    const periodAtt=dayAtt[p]||{};
+    const pres=Object.values(periodAtt).filter(v=>v==='P').length;
+    const abs=Object.values(periodAtt).filter(v=>v==='A').length;
+    const lv=Object.values(periodAtt).filter(v=>v==='L').length;
+    const od=Object.values(periodAtt).filter(v=>v==='OD').length;
+    html+=`<div class="stat-card" style="border-top-color:var(--teal);">
+      <div class="stat-value">P${p}</div>
+      <div class="stat-label">Period ${p}</div>
+      <div style="font-size:.75rem;margin-top:6px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+        <span class="badge badge-present">${pres}P</span>
+        <span class="badge badge-absent">${abs}A</span>
+        <span class="badge badge-leave">${lv}L</span>
+        <span class="badge badge-od">${od}OD</span>
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+
+  // Student detail table
+  html+=`<div class="att-table-wrap"><table class="att-table">
+  <thead><tr><th>#</th><th class="left">Roll</th><th class="left">Name</th>
+    ${savedPeriods.map(p=>`<th>P${p}</th>`).join('')}<th>Day Status</th></tr></thead><tbody>`;
+
+  students.forEach((s,i)=>{
+    let cells=savedPeriods.map(p=>{
+      const st=dayAtt[p]?.[s.roll]||'--';
+      const cls=st==='P'?'hc-P':st==='A'?'hc-A':st==='L'?'hc-L':st==='OD'?'hc-OD':'hc--';
+      return`<td class="history-cell ${cls}">${st}</td>`;
+    }).join('');
+
+    // Day status
+    const fnStatuses=savedPeriods.filter(p=>p<=4).map(p=>dayAtt[p]?.[s.roll]||'--');
+    const anStatuses=savedPeriods.filter(p=>p>=5).map(p=>dayAtt[p]?.[s.roll]||'--');
+    const hasA_fn=fnStatuses.some(s=>s==='A');
+    const hasA_an=anStatuses.some(s=>s==='A');
+    const dayStatus=hasA_fn&&hasA_an?'<span class="badge badge-absent">2-Day Penalty</span>':
+      hasA_fn||hasA_an?'<span class="badge badge-absent">1-Day Absent</span>':
+      '<span class="badge badge-present">Present</span>';
+
+    html+=`<tr><td class="sno">${i+1}</td><td class="sroll">${s.roll}</td>
+      <td class="sname">${s.name}</td>${cells}<td>${dayStatus}</td></tr>`;
+  });
+
+  html+=`</tbody></table></div>`;
+  document.getElementById('dailyContent').innerHTML=html;
+}
+
+// ===================================================================
+//  TIMETABLE
+// ===================================================================
+function initTimetablePage(){
+  loadTTDay();
+  renderTTView();
+  renderCourses();
+}
+
+function loadTTDay(){
+  const day=document.getElementById('ttDay').value;
+  const tt=DB.get('timetable')||{};
+  const dayTT=tt[day]||Array(7).fill({course:'',faculty:''});
+  const courses=DB.get('courses')||[];
+  const facAccts=DB.get('faculty_accounts')||{};
+
+  const grid=document.getElementById('ttDayGrid');
+  grid.innerHTML='';
+  const periodNames=['P1','P2','P3','P4','P5','P6','P7'];
+  const sessions=['FN','FN','FN','FN','AN','AN','AN'];
+
+  for(let i=0;i<7;i++){
+    const cell=document.createElement('div');
+    cell.className='tt-cell';
+    const courseOpts=courses.map(c=>`<option value="${c.code}" ${dayTT[i]?.course===c.code?'selected':''}>${c.code} – ${c.name.substr(0,18)}</option>`).join('');
+    const facOpts=Object.keys(facAccts).filter(k=>k!=='advisor'&&k!=='tutor1'&&k!=='tutor2')
+      .map(k=>`<option value="${k}" ${dayTT[i]?.faculty===k?'selected':''}>${facAccts[k].name}</option>`).join('');
+
+    cell.innerHTML=`<label>${periodNames[i]} (${sessions[i]})</label>
+      <select id="tt_course_${i}" style="margin-bottom:4px;">${courseOpts}</select>
+      <select id="tt_fac_${i}">${facOpts}</select>`;
+    grid.appendChild(cell);
+  }
+}
+
+function saveTTDay(){
+  const day=document.getElementById('ttDay').value;
+  const tt=DB.get('timetable')||{};
+  const slots=[];
+  for(let i=0;i<7;i++){
+    slots.push({
+      course:document.getElementById(`tt_course_${i}`).value,
+      faculty:document.getElementById(`tt_fac_${i}`).value
+    });
+  }
+  tt[day]=slots;
+  DB.set('timetable',tt);
+  toast(`Timetable saved for ${day}`,'success');
+  renderTTView();
+}
+
+function renderTTView(){
+  const tt=DB.get('timetable')||{};
+  const courses=DB.get('courses')||[];
+  const facAccts=DB.get('faculty_accounts')||{};
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  let html=`<div style="overflow-x:auto;"><table class="att-table">
+  <thead><tr><th>Day</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th></tr></thead><tbody>`;
+
+  days.forEach(d=>{
+    const dayTT=tt[d]||[];
+    html+=`<tr><td style="font-weight:600;font-size:.82rem;">${d}</td>`;
+    for(let i=0;i<7;i++){
+      const slot=dayTT[i]||{};
+      const c=courses.find(x=>x.code===slot.course);
+      const f=facAccts[slot.faculty];
+      html+=`<td style="font-size:.72rem;padding:6px 4px;">
+        <div style="font-weight:600;color:var(--navy);">${slot.course||'--'}</div>
+        <div style="color:var(--muted);">${c?c.name.substr(0,12)+'..':''}</div>
+      </td>`;
+    }
+    html+=`</tr>`;
+  });
+
+  html+=`</tbody></table></div>`;
+  document.getElementById('ttViewContent').innerHTML=html;
+}
+
+function renderCourses(){
+  const courses=DB.get('courses')||[];
+  const facAccts=DB.get('faculty_accounts')||{};
+  const facs=Object.keys(facAccts).filter(k=>!['advisor','tutor1','tutor2'].includes(k));
+
+  // Populate add dropdown
+  const sel=document.getElementById('newCourseFac');
+  sel.innerHTML='<option value="">Assign Faculty</option>';
+  facs.forEach(k=>{
+    const o=document.createElement('option');
+    o.value=k;o.textContent=facAccts[k].name;sel.appendChild(o);
+  });
+
+  let html=`<div class="att-table-wrap"><table class="att-table">
+  <thead><tr><th>Code</th><th class="left">Course Name</th><th>Assigned Faculty</th><th>Action</th></tr></thead><tbody>`;
+  courses.forEach((c,i)=>{
+    const f=facAccts[c.faculty];
+    html+=`<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.82rem;">${c.code}</td>
+      <td class="sname">${c.name}</td>
+      <td style="font-size:.82rem;">${f?.name||'--'}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="deleteCourse(${i})">Remove</button></td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  document.getElementById('coursesContent').innerHTML=html;
+}
+
+function addCourse(){
+  const code=document.getElementById('newCourseCode').value.trim();
+  const name=document.getElementById('newCourseName').value.trim();
+  const fac=document.getElementById('newCourseFac').value;
+  if(!code||!name){toast('Enter code and name','error');return;}
+  const courses=DB.get('courses')||[];
+  if(courses.find(c=>c.code===code)){toast('Code already exists','error');return;}
+  courses.push({code,name,faculty:fac});
+  DB.set('courses',courses);
+  document.getElementById('newCourseCode').value='';
+  document.getElementById('newCourseName').value='';
+  renderCourses();
+  toast(`Course ${code} added`,'success');
+}
+
+function deleteCourse(idx){
+  const courses=DB.get('courses')||[];
+  if(!confirm(`Remove ${courses[idx].code}?`))return;
+  courses.splice(idx,1);
+  DB.set('courses',courses);
+  renderCourses();
+  toast('Course removed','info');
+}
+
+// ===================================================================
+//  STUDENTS
+// ===================================================================
+function renderStudentList(){
+  const students=DB.get('students')||[];
+  let html=`<div class="att-table-wrap"><table class="att-table">
+  <thead><tr><th>#</th><th class="left">Roll No.</th><th class="left">Name</th>
+    <th>Mobile</th><th>Email</th><th>Attendance %</th><th>Action</th></tr></thead><tbody>`;
+  students.forEach((s,i)=>{
+    const pct=calcStudentPct(s.roll);
+    const pc=pct>=85?'pct-high':pct>=75?'pct-mid':'pct-low';
+    html+=`<tr>
+      <td class="sno">${i+1}</td>
+      <td class="sroll">${s.roll}</td>
+      <td class="sname">${s.name}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${s.mobile||'--'}</td>
+      <td style="font-size:.75rem;">${s.email||'--'}</td>
+      <td><span class="pct-badge ${pc}">${pct>0?pct.toFixed(1)+'%':'N/A'}</span></td>
+      <td><button class="btn btn-sm btn-danger" onclick="removeStudent('${s.roll}')">Remove</button></td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  document.getElementById('studentListContent').innerHTML=html;
+
+  // Parent contacts
+  let phtml=`<div class="att-table-wrap"><table class="att-table">
+  <thead><tr><th>#</th><th class="left">Roll</th><th class="left">Name</th><th>Parent Mobile</th><th>Update</th></tr></thead><tbody>`;
+  students.forEach((s,i)=>{
+    phtml+=`<tr>
+      <td class="sno">${i+1}</td>
+      <td class="sroll">${s.roll}</td>
+      <td class="sname">${s.name}</td>
+      <td><input type="text" value="${s.mobile||''}" id="mob_${s.roll}"
+        style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;width:120px;font-family:'JetBrains Mono',monospace;"/></td>
+      <td><button class="btn btn-sm btn-primary" onclick="updateMobile('${s.roll}')">Save</button></td>
+    </tr>`;
+  });
+  phtml+=`</tbody></table></div>`;
+  document.getElementById('parentContactContent').innerHTML=phtml;
+}
+
+function addStudent(){
+  const roll=document.getElementById('newRoll').value.trim();
+  const name=document.getElementById('newName').value.trim();
+  const mobile=document.getElementById('newMobile').value.trim();
+  const email=document.getElementById('newEmail').value.trim();
+  if(!roll||!name){toast('Enter roll and name','error');return;}
+  const students=DB.get('students')||[];
+  if(students.find(s=>s.roll===roll)){toast('Roll already exists','error');return;}
+  students.push({roll,name,mobile,email});
+  DB.set('students',students);
+  toast(`${name} added`,'success');
+  document.getElementById('newRoll').value='';
+  document.getElementById('newName').value='';
+  document.getElementById('newMobile').value='';
+  document.getElementById('newEmail').value='';
+  switchTab('st','stList');
+  renderStudentList();
+}
+
+function removeStudent(roll){
+  if(!confirm(`Remove student ${roll}?`))return;
+  const students=DB.get('students')||[];
+  DB.set('students',students.filter(s=>s.roll!==roll));
+  renderStudentList();
+  toast('Student removed','info');
+}
+
+function updateMobile(roll){
+  const mobile=document.getElementById('mob_'+roll).value.trim();
+  const students=DB.get('students')||[];
+  const s=students.find(st=>st.roll===roll);
+  if(s){s.mobile=mobile;DB.set('students',students);toast('Mobile updated','success');}
+}
+
+// ===================================================================
+//  SMS PAGE  –  FULL PARENT DATABASE + SMS CENTRE
+// ===================================================================
+
+/* ---- DEFAULT TEMPLATES ---- */
+const DEFAULT_TMPL_EN=`Dear {parent}, your ward {name} (Roll: {roll}) of II ECE-C, Dept. of ECE, Sri Eshwar College of Engineering has an attendance of {pct}% which is below the required 85%. Kindly ensure regular attendance to avoid detention. For queries contact the Department office.`;
+const DEFAULT_TMPL_TA=`அன்பான {parent} அவர்களே, உங்கள் மாணவர் {name} (ரோல் எண்: {roll}), II ECE-C பிரிவின் தற்போதைய வருகை சதவீதம் {pct}% ஆக உள்ளது. இது தேவையான 85%-ஐ விட குறைவாக உள்ளது. தொடர்ந்து கல்லூரிக்கு அனுப்புமாறு கேட்டுக்கொள்கிறோம். — ஸ்ரீ ஈஸ்வர் பொறியியல் கல்லூரி.`;
+
+function getTemplates(){
+  return DB.get('sms_templates')||{en:DEFAULT_TMPL_EN,ta:DEFAULT_TMPL_TA};
+}
+
+function fillTemplate(tmpl,student,pct,parentName){
+  return tmpl
+    .replace(/{name}/g,student.name)
+    .replace(/{roll}/g,student.roll)
+    .replace(/{pct}/g,pct.toFixed(1))
+    .replace(/{parent}/g,parentName||'Parent');
+}
+
+function initSMSPage(){
+  ensureParentDB();
+  loadTemplateEditors();
+  renderParentDB();
+  populateSMSStudentSelect();
+  renderSentLog();
+  updateBatchPreview();
+}
+
+/* ---- ensure parent DB exists ---- */
+function ensureParentDB(){
+  if(!DB.get('parent_db')){
+    // build from students' existing mobiles
+    const students=DB.get('students')||[];
+    const db={};
+    students.forEach(s=>{
+      db[s.roll]={mobile:s.mobile||'',parentName:'',relation:'',verified:false,notes:''};
+    });
+    DB.set('parent_db',db);
+  }
+}
+
+/* ---- sync parent_db with students list ---- */
+function syncParentDB(){
+  const students=DB.get('students')||[];
+  const db=DB.get('parent_db')||{};
+  students.forEach(s=>{
+    if(!db[s.roll])db[s.roll]={mobile:'',parentName:'',relation:'',verified:false,notes:''};
+    // keep mobile in sync with student record too
+    if(db[s.roll].mobile&&!s.mobile){s.mobile=db[s.roll].mobile;}
+  });
+  DB.set('parent_db',db);
+  DB.set('students',students);
+}
+
+/* ---- render parent DB table ---- */
+function renderParentDB(){
+  ensureParentDB();
+  syncParentDB();
+  const students=DB.get('students')||[];
+  const db=DB.get('parent_db')||{};
+  const search=(document.getElementById('parentSearch')?.value||'').toLowerCase();
+  const filter=document.getElementById('parentFilter')?.value||'all';
+
+  let filtered=students.filter(s=>{
+    const entry=db[s.roll]||{};
+    const pct=calcStudentPct(s.roll);
+    const matchSearch=!search||s.name.toLowerCase().includes(search)||s.roll.toLowerCase().includes(search);
+    const matchFilter=
+      filter==='all'||
+      (filter==='missing'&&!entry.mobile)||
+      (filter==='low'&&pct>0&&pct<85)||
+      (filter==='verified'&&entry.verified);
+    return matchSearch&&matchFilter;
+  });
+
+  const total=students.length;
+  const hasMobile=students.filter(s=>db[s.roll]?.mobile).length;
+  const verified=students.filter(s=>db[s.roll]?.verified).length;
+  document.getElementById('dbStats').textContent=
+    `${hasMobile}/${total} mobiles entered | ${verified} verified`;
+
+  if(!filtered.length){
+    document.getElementById('parentDBTable').innerHTML=
+      '<p style="color:var(--muted);padding:20px;text-align:center;">No matching records found.</p>';
+    return;
+  }
+
+  let html=`<div class="att-table-wrap"><table class="att-table">
+  <thead><tr>
+    <th>#</th><th class="left">Roll</th><th class="left">Student Name</th>
+    <th>Parent Name</th><th>Relation</th><th>Mobile Number</th>
+    <th>Att%</th><th>Verified</th><th>Actions</th>
+  </tr></thead><tbody>`;
+
+  filtered.forEach((s,i)=>{
+    const e=db[s.roll]||{};
+    const pct=calcStudentPct(s.roll);
+    const pc=pct>=85?'pct-high':pct>=75?'pct-mid':'pct-low';
+    const missing=!e.mobile;
+    html+=`<tr id="prow_${s.roll}" ${missing?'style="background:#fffde7;"':''}>
+      <td class="sno">${i+1}</td>
+      <td class="sroll">${s.roll}</td>
+      <td class="sname">${s.name}</td>
+      <td><input type="text" id="pn_${s.roll}" value="${e.parentName||''}"
+        placeholder="Parent Name"
+        style="width:110px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-size:.78rem;outline:none;"/></td>
+      <td><select id="pr_${s.roll}"
+        style="padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-size:.78rem;outline:none;">
+        <option value="Father" ${e.relation==='Father'?'selected':''}>Father</option>
+        <option value="Mother" ${e.relation==='Mother'?'selected':''}>Mother</option>
+        <option value="Guardian" ${e.relation==='Guardian'?'selected':''}>Guardian</option>
+      </select></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <input type="tel" id="pm_${s.roll}" value="${e.mobile||''}"
+            placeholder="10-digit mobile"
+            style="width:120px;padding:4px 7px;border:2px solid ${missing?'#ef9a9a':'var(--border)'};border-radius:6px;
+              font-size:.8rem;font-family:'JetBrains Mono',monospace;outline:none;"
+            oninput="validateMobileInput(this)"/>
+          ${missing?'<span style="color:#c62828;font-size:.7rem;">⚠️ Missing</span>':''}
+        </div>
+      </td>
+      <td><span class="pct-badge ${pc}">${pct>0?pct.toFixed(1)+'%':'N/A'}</span></td>
+      <td style="text-align:center;">
+        <input type="checkbox" id="pv_${s.roll}" ${e.verified?'checked':''}
+          style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);"
+          title="Mark as verified"/>
+      </td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-sm btn-primary" onclick="saveParentEntry('${s.roll}')">💾</button>
+          <button class="btn btn-sm btn-success" onclick="quickSendSMS('${s.roll}')"
+            ${!e.mobile?'disabled':''} title="Send SMS">📱</button>
+        </div>
+      </td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div>
+  <div style="margin-top:12px;display:flex;gap:10px;">
+    <button class="btn btn-success" onclick="saveAllParentEntries()">💾 Save All Changes</button>
+  </div>`;
+  document.getElementById('parentDBTable').innerHTML=html;
+}
+
+function validateMobileInput(input){
+  const v=input.value.replace(/\D/g,'');
+  input.value=v;
+  if(v.length===10)input.style.borderColor='var(--green)';
+  else if(v.length>0)input.style.borderColor='var(--orange)';
+  else input.style.borderColor='#ef9a9a';
+}
+
+function saveParentEntry(roll){
+  const db=DB.get('parent_db')||{};
+  const students=DB.get('students')||[];
+  const mobile=(document.getElementById('pm_'+roll)?.value||'').trim();
+  const parentName=(document.getElementById('pn_'+roll)?.value||'').trim();
+  const relation=document.getElementById('pr_'+roll)?.value||'Father';
+  const verified=document.getElementById('pv_'+roll)?.checked||false;
+
+  if(mobile&&mobile.length!==10){toast(`${roll}: Mobile must be 10 digits`,'error');return;}
+
+  if(!db[roll])db[roll]={};
+  db[roll]={mobile,parentName,relation,verified,notes:db[roll].notes||''};
+  DB.set('parent_db',db);
+
+  // sync to student record
+  const s=students.find(st=>st.roll===roll);
+  if(s){s.mobile=mobile;DB.set('students',students);}
+
+  toast(`Saved: ${roll}`,'success');
+  renderParentDB();
+}
+
+function saveAllParentEntries(){
+  const students=DB.get('students')||[];
+  let saved=0,errors=0;
+  students.forEach(s=>{
+    const mEl=document.getElementById('pm_'+s.roll);
+    if(!mEl)return;
+    const mobile=mEl.value.trim();
+    if(mobile&&mobile.length!==10){errors++;return;}
+    const db=DB.get('parent_db')||{};
+    const parentName=(document.getElementById('pn_'+s.roll)?.value||'').trim();
+    const relation=document.getElementById('pr_'+s.roll)?.value||'Father';
+    const verified=document.getElementById('pv_'+s.roll)?.checked||false;
+    if(!db[s.roll])db[s.roll]={};
+    db[s.roll]={mobile,parentName,relation,verified,notes:db[s.roll].notes||''};
+    DB.set('parent_db',db);
+    s.mobile=mobile;
+    saved++;
+  });
+  DB.set('students',students);
+  toast(`Saved ${saved} records${errors?` | ${errors} errors (invalid mobile length)`:'`'}`,'success');
+  renderParentDB();
+}
+
+/* ---- Bulk import ---- */
+function doBulkImport(){
+  const raw=document.getElementById('bulkImportText').value.trim();
+  if(!raw){toast('Paste CSV data first','error');return;}
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const db=DB.get('parent_db')||{};
+  const students=DB.get('students')||[];
+  let ok=0,skipped=0,notFound=0;
+  const errors=[];
+
+  lines.forEach((line,idx)=>{
+    const parts=line.split(',').map(p=>p.trim());
+    const roll=parts[0];const mobile=parts[1];const parentName=parts[2]||'';const relation=parts[3]||'Father';
+    if(!roll||!mobile){skipped++;return;}
+    const student=students.find(s=>s.roll===roll);
+    if(!student){notFound++;errors.push(`Line ${idx+1}: Roll ${roll} not found`);return;}
+    if(mobile.replace(/\D/g,'').length!==10){errors.push(`Line ${idx+1}: ${roll} mobile invalid`);skipped++;return;}
+    db[roll]={mobile:mobile.replace(/\D/g,''),parentName,relation,verified:false,notes:''};
+    student.mobile=mobile.replace(/\D/g,'');
+    ok++;
+  });
+
+  DB.set('parent_db',db);DB.set('students',students);
+  const res=`✅ Imported: <strong>${ok}</strong> | ⏭ Skipped: ${skipped} | ❌ Not found: ${notFound}`;
+  document.getElementById('bulkImportResult').innerHTML=res+(errors.length?`<br><small style="color:var(--rose);">${errors.join('<br>')}</small>`:'');
+  toast(`Bulk import: ${ok} records saved`,'success');
+  renderParentDB();
+}
+
+function exportParentCSV(){
+  const students=DB.get('students')||[];
+  const db=DB.get('parent_db')||{};
+  const rows=[['Roll','Student Name','Parent Name','Relation','Mobile','Verified','Attendance%']];
+  students.forEach(s=>{
+    const e=db[s.roll]||{};
+    const pct=calcStudentPct(s.roll);
+    rows.push([s.roll,s.name,e.parentName||'',e.relation||'',e.mobile||'',e.verified?'Yes':'No',pct>0?pct.toFixed(1)+'%':'N/A']);
+  });
+  downloadCSV(rows,'parent_contacts.csv');
+}
+
+/* ---- Student select for individual send ---- */
+function populateSMSStudentSelect(){
+  const sel=document.getElementById('smsStudent');
+  if(!sel)return;
+  sel.innerHTML='<option value="">Select Student</option>';
+  const students=DB.get('students')||[];
+  students.forEach(s=>{
+    const o=document.createElement('option');
+    o.value=s.roll;o.textContent=`${s.roll} – ${s.name}`;
+    sel.appendChild(o);
+  });
+}
+
+function onSMSStudentChange(){
+  const roll=document.getElementById('smsStudent').value;
+  const previewEl=document.getElementById('smsStudentPreview');
+  const msgPreviewEl=document.getElementById('smsMessagePreview');
+  const sendBtn=document.getElementById('btnSendSMS');
+  if(!roll){
+    previewEl.style.display='none';msgPreviewEl.style.display='none';
+    sendBtn.disabled=true;return;
+  }
+  const students=DB.get('students')||[];
+  const db=DB.get('parent_db')||{};
+  const s=students.find(st=>st.roll===roll);
+  const e=db[roll]||{};
+  const pct=calcStudentPct(roll);
+  const pc=pct>=85?'pct-high':pct>=75?'pct-mid':'pct-low';
+
+  previewEl.style.display='';
+  document.getElementById('prev_name').textContent=s?.name||'--';
+  document.getElementById('prev_roll').textContent=roll;
+  document.getElementById('prev_pct').className=`pct-badge ${pc}`;
+  document.getElementById('prev_pct').textContent=pct>0?pct.toFixed(1)+'%':'N/A';
+  document.getElementById('prev_mobile').textContent=e.mobile||'⚠️ Not registered';
+  document.getElementById('prev_mobile').style.color=e.mobile?'var(--navy)':'var(--rose)';
+  document.getElementById('prev_relation').textContent=e.relation||'--';
+
+  updateIndivMessagePreview(s,e,pct);
+
+  sendBtn.disabled=!e.mobile;
+  if(!e.mobile)sendBtn.title='Register parent mobile first';
+  else sendBtn.title='';
+}
+
+function updateIndivMessagePreview(s,e,pct){
+  const tmpl=document.getElementById('indivTemplate').value;
+  const templates=getTemplates();
+  const msgEl=document.getElementById('smsMessagePreview');
+  if(!s){msgEl.style.display='none';return;}
+  msgEl.style.display='';
+  let preview='';
+  if(tmpl==='en'||tmpl==='both'){
+    preview+=`<div class="sms-msg"><strong>🇬🇧 English:</strong><br>${fillTemplate(templates.en,s,pct,e.parentName||'Parent')}</div>`;
+  }
+  if(tmpl==='ta'||tmpl==='both'){
+    preview+=`<div class="sms-msg-ta" style="margin-top:8px;"><strong>🇮🇳 Tamil:</strong><br>${fillTemplate(templates.ta,s,pct,e.parentName||'Parent')}</div>`;
+  }
+  msgEl.innerHTML=preview;
+}
+
+/* ---- Batch preview ---- */
+function updateBatchPreview(){
+  const students=DB.get('students')||[];
+  const db=DB.get('parent_db')||{};
+  const low=students.filter(s=>{const p=calcStudentPct(s.roll);return p>0&&p<85;});
+  const withMobile=low.filter(s=>db[s.roll]?.mobile);
+  const noMobile=low.filter(s=>!db[s.roll]?.mobile);
+  const el=document.getElementById('batchSendPreview');
+  if(!el)return;
+  el.innerHTML=`<div style="font-size:.82rem;color:#5d4037;margin-top:8px;">
+    <span style="color:var(--rose);font-weight:600;">${low.length}</span> students below 85% —
+    <span style="color:var(--green);font-weight:600;">${withMobile.length}</span> have parent mobile
+    ${noMobile.length?`| <span style="color:var(--orange);">${noMobile.length} missing mobile</span> (will be skipped)`:''}
+  </div>`;
+}
+
+function sendBatchSMS(){
+  const students=DB.get('students')||[];
+  const db=DB.get('parent_db')||{};
+  const templates=getTemplates();
+  const tmpl=document.getElementById('batchTemplate').value;
+  const low=students.filter(s=>{const p=calcStudentPct(s.roll);return p>0&&p<85&&db[s.roll]?.mobile;});
+  if(!low.length){toast('No eligible students (all above 85% or no mobile registered)','info');return;}
+  low.forEach(s=>{
+    const e=db[s.roll]||{};
+    const pct=calcStudentPct(s.roll);
+    const msgs=[];
+    if(tmpl==='en'||tmpl==='both')msgs.push(fillTemplate(templates.en,s,pct,e.parentName||'Parent'));
+    if(tmpl==='ta'||tmpl==='both')msgs.push(fillTemplate(templates.ta,s,pct,e.parentName||'Parent'));
+    logSMS(s.roll,s.name,e.mobile,pct,msgs.join(' | '));
+  });
+  toast(`📱 SMS queued for ${low.length} parent(s)`,'success');
+  renderSentLog();
+}
+
+function sendSMS(){
+  const roll=document.getElementById('smsStudent')?.value;
+  if(!roll){toast('Select a student','error');return;}
+  sendSMSFor(roll);
+  renderSentLog();
+  toast('SMS sent!','success');
+}
+
+function quickSendSMS(roll){
+  sendSMSFor(roll);
+  renderSentLog();
+  switchTab('sms','smsHistory');
+  toast('SMS sent!','success');
+}
+
+function sendSMSFor(roll,silent=false){
+  const students=DB.get('students')||[];
+  const db=DB.get('parent_db')||{};
+  const s=students.find(st=>st.roll===roll);
+  const e=db[roll]||{};
+  const pct=calcStudentPct(roll);
+  const templates=getTemplates();
+  const msg=fillTemplate(templates.en,s,pct,e.parentName||'Parent');
+  logSMS(roll,s?.name,e.mobile||s?.mobile,pct,msg);
+  if(!silent)toast(`SMS sent to ${s?.name}'s parent (${e.mobile||s?.mobile})`,'success');
+}
+
+function logSMS(roll,name,mobile,pct,message){
+  const log=DB.get('sms_log')||[];
+  log.push({roll,name,mobile,pct:typeof pct==='number'?pct.toFixed(1):pct,
+    message,time:new Date().toLocaleString()});
+  DB.set('sms_log',log);
+}
+
+function renderSentLog(){
+  const el=document.getElementById('smsSentLog');
+  if(!el)return;
+  const log=(DB.get('sms_log')||[]).slice().reverse().slice(0,50);
+  if(!log.length){
+    el.innerHTML='<p style="color:var(--muted);padding:20px;text-align:center;">No messages sent yet.</p>';return;
+  }
+  el.innerHTML=`<div class="att-table-wrap"><table class="att-table">
+  <thead><tr><th>Sent At</th><th class="left">Student</th><th>Parent Mobile</th>
+    <th>Att%</th><th class="left">Message Preview</th></tr></thead>
+  <tbody>${log.map(l=>`<tr>
+    <td style="font-size:.72rem;white-space:nowrap;">${l.time}</td>
+    <td class="sname">${l.name||'--'}<br><span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);">${l.roll}</span></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.mobile||'--'}</td>
+    <td><span class="pct-badge pct-low">${l.pct}%</span></td>
+    <td style="font-size:.72rem;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+      title="${(l.message||'').replace(/"/g,'&quot;')}">${(l.message||'').substring(0,80)}…</td>
+  </tr>`).join('')}</tbody></table></div>`;
+}
+
+/* ---- Template editors ---- */
+function loadTemplateEditors(){
+  const t=getTemplates();
+  const enEl=document.getElementById('tmplEN');
+  const taEl=document.getElementById('tmplTA');
+  if(enEl)enEl.value=t.en;
+  if(taEl)taEl.value=t.ta;
+  renderTemplatePreview();
+}
+
+function saveTemplates(){
+  const en=document.getElementById('tmplEN')?.value||DEFAULT_TMPL_EN;
+  const ta=document.getElementById('tmplTA')?.value||DEFAULT_TMPL_TA;
+  DB.set('sms_templates',{en,ta});
+  toast('Templates saved','success');
+  renderTemplatePreview();
+}
+
+function renderTemplatePreview(){
+  const t=getTemplates();
+  const dummy={name:'Arjun Kumar',roll:'211EC001'};
+  const pct=72.5;
+  const el=document.getElementById('templatePreview');
+  if(!el)return;
+  el.innerHTML=`
+    <div class="sms-msg"><strong>🇬🇧 English Preview:</strong><br>${fillTemplate(t.en,dummy,pct,'Mr. Ramesh Kumar')}</div>
+    <div class="sms-msg-ta" style="margin-top:8px;"><strong>🇮🇳 Tamil Preview:</strong><br>${fillTemplate(t.ta,dummy,pct,'திரு. ரமேஷ் குமார்')}</div>`;
+}
+
+// ===================================================================
+//  ADMIN PAGE
+// ===================================================================
+function initAdminPage(){
+  if(currentUser!=='advisor'){
+    document.getElementById('page-admin').innerHTML='<div class="card"><p style="color:var(--rose);padding:20px;">⛔ Access Denied – Class Advisor only.</p></div>';
+    return;
+  }
+  renderFacultyList();
+  renderHolidayList();
+}
+
+function renderFacultyList(){
+  const facAccts=DB.get('faculty_accounts')||{};
+  const html=Object.keys(facAccts).map(k=>{
+    const f=facAccts[k];
+    const roleClass=k==='advisor'?'role-advisor':k.includes('tutor')?'role-tutor':'role-faculty';
+    return`<div class="faculty-card">
+      <div class="faculty-avatar">${f.name[0]}</div>
+      <div class="faculty-info">
+        <h4>${f.name}</h4>
+        <p>Login key: <code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:.78rem;">${k}</code></p>
+      </div>
+      <span class="faculty-role ${roleClass}">${f.role}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('facultyListContent').innerHTML=html;
+}
+
+function renderHolidayList(){
+  const hol=DB.get('holidays')||{};
+  const dates=Object.keys(hol).sort();
+  if(!dates.length){
+    document.getElementById('holidayListContent').innerHTML='<p style="color:var(--muted);font-size:.85rem;">No holidays added yet.</p>';
+    return;
+  }
+  let html=`<div class="att-table-wrap" style="margin-top:12px;"><table class="att-table">
+  <thead><tr><th>Date</th><th class="left">Holiday Name</th><th>Action</th></tr></thead><tbody>`;
+  dates.forEach(d=>{
+    html+=`<tr><td style="font-family:'JetBrains Mono',monospace;">${d}</td>
+      <td class="sname">${hol[d]}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="removeHoliday('${d}')">Remove</button></td></tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  document.getElementById('holidayListContent').innerHTML=html;
+}
+
+function addHoliday(){
+  const date=document.getElementById('holDate').value;
+  const name=document.getElementById('holName').value.trim()||'Holiday';
+  if(!date){toast('Select a date','error');return;}
+  const hol=DB.get('holidays')||{};
+  hol[date]=name;
+  DB.set('holidays',hol);
+  toast(`${date} marked as ${name}`,'success');
+  renderHolidayList();
+}
+
+function removeHoliday(date){
+  const hol=DB.get('holidays')||{};
+  delete hol[date];
+  DB.set('holidays',hol);
+  toast('Holiday removed','info');
+  renderHolidayList();
+}
+
+function loadEditAttendance(){
+  if(currentUser!=='advisor'){toast('Only class advisor can edit','error');return;}
+  const date=document.getElementById('editDate').value;
+  const roll=document.getElementById('editStudent').value;
+  if(!date||!roll){toast('Select date and student','error');return;}
+
+  const att=DB.get('attendance')||{};
+  const saved=DB.get('saved_periods')||{};
+  const savedToday=saved[date]||[];
+  const students=DB.get('students')||[];
+  const s=students.find(st=>st.roll===roll);
+
+  let html=`<h4 style="margin:12px 0;">Editing: ${s?.name} (${roll}) – ${date}</h4>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">`;
+
+  for(let p=1;p<=7;p++){
+    const curStatus=(att[date]||{})[p]?.[roll]||'--';
+    html+=`<div style="background:var(--bg);border-radius:8px;padding:12px;min-width:120px;">
+      <div style="font-weight:700;font-size:.82rem;margin-bottom:8px;color:var(--navy);">Period ${p}</div>
+      ${savedToday.includes(p)?`
+        <select id="edit_p${p}" style="padding:6px;border:2px solid var(--border);border-radius:6px;font-size:.82rem;outline:none;">
+          <option value="P" ${curStatus==='P'?'selected':''}>Present</option>
+          <option value="A" ${curStatus==='A'?'selected':''}>Absent</option>
+          <option value="L" ${curStatus==='L'?'selected':''}>Leave</option>
+          <option value="OD" ${curStatus==='OD'?'selected':''}>OD</option>
+        </select>`
+      :`<span style="color:var(--muted);font-size:.75rem;">Not recorded</span>`}
+    </div>`;
+  }
+
+  html+=`</div>
+  <button class="btn btn-success" style="margin-top:14px;" onclick="saveEditAttendance('${date}','${roll}',${JSON.stringify(savedToday)})">💾 Save Changes</button>`;
+  document.getElementById('editAttContent').innerHTML=html;
+}
+
+function saveEditAttendance(date,roll,savedPeriods){
+  const att=DB.get('attendance')||{};
+  if(!att[date])att[date]={};
+  savedPeriods.forEach(p=>{
+    const sel=document.getElementById(`edit_p${p}`);
+    if(sel){
+      if(!att[date][p])att[date][p]={};
+      att[date][p][roll]=sel.value;
+    }
+  });
+  DB.set('attendance',att);
+  toast('Attendance updated by Class Advisor','success');
+}
+
+function backupData(){
+  const data={
+    students:DB.get('students'),
+    attendance:DB.get('attendance'),
+    courses:DB.get('courses'),
+    timetable:DB.get('timetable'),
+    holidays:DB.get('holidays'),
+    saved_periods:DB.get('saved_periods'),
+    sms_log:DB.get('sms_log'),
+    exported:new Date().toISOString()
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`sece_attendance_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  toast('Backup downloaded','success');
+}
+
+function resetData(){
+  ['attendance','saved_periods','sms_log'].forEach(k=>DB.del(k));
+  DB.set('attendance',{});DB.set('saved_periods',{});DB.set('sms_log',[]);
+  toast('Attendance data reset','info');
+}
+
+// ===================================================================
+//  MODAL
+// ===================================================================
+function showModal(title,body,actions){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=body;
+  const actEl=document.getElementById('modalActions');
+  actEl.innerHTML='';
+  actions.forEach(a=>{
+    const btn=document.createElement('button');
+    btn.className=`btn ${a.cls}`;btn.textContent=a.label;
+    btn.onclick=a.fn;actEl.appendChild(btn);
+  });
+  document.getElementById('modalOverlay').style.display='flex';
+}
+function closeModal(){document.getElementById('modalOverlay').style.display='none';}
+
+// ===================================================================
+//  TOAST
+// ===================================================================
+function toast(msg,type='info'){
+  const container=document.getElementById('toast');
+  const el=document.createElement('div');
+  el.className=`toast-item ${type}`;
+  el.innerHTML=(type==='success'?'✅':type==='error'?'❌':'ℹ️')+' '+msg;
+  container.appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+// ===================================================================
+//  CSV EXPORT
+// ===================================================================
+function downloadCSV(rows,filename){
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;a.click();
+  toast('CSV exported','success');
+}
+
+// ===================================================================
+//  INIT
+// ===================================================================
+initData();
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click',function(e){
+  if(e.target===this)closeModal();
+});
+</script>
+</body>
+</html>
